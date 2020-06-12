@@ -1,3 +1,7 @@
+######################################
+# Model to generate Speaker embedding
+######################################
+
 import torch
 import torch.nn as nn
 
