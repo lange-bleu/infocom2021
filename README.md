@@ -1,3 +1,7 @@
+# Infocom2021
+Flowchartof the AI network.
+![](./assets/FlowchartNetwork.png)
+
 # VoiceFilter
 
 Unofficial PyTorch implementation of Google AI's:
