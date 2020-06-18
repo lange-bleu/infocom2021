@@ -1,3 +1,7 @@
+########################################################
+# Perfrom STFT for each files before training
+########################################################
+
 import os
 import glob
 import tqdm
