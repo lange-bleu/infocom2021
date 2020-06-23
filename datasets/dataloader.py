@@ -53,10 +53,12 @@ class VFDataset(Dataset):
         self.target_wav_list = find_all(hp.form.target.wav)
         self.mixed_wav_list = find_all(hp.form.mixed.wav)
         self.target_mag_list = find_all(hp.form.target.mag)
+        self.target_phase_list = find_all(hp.form.target.phase)
         self.mixed_mag_list = find_all(hp.form.mixed.mag)
+        self.mixed_phase_list = find_all(hp.form.mixed.phase)
 
         assert len(self.dvec_list) == len(self.target_wav_list) == len(self.mixed_wav_list) == \
-            len(self.target_mag_list) == len(self.mixed_mag_list), "number of training files must match"
+            len(self.target_mag_list) == len(self.mixed_mag_list)==len(self.target_phase_list) == len(self.mixed_phase_list), "number of training files must match"
         assert len(self.dvec_list) != 0, \
             "no training file found"
 
@@ -74,9 +76,14 @@ class VFDataset(Dataset):
         dvec_mel = torch.from_numpy(dvec_mel).float()
 
         if self.train: # need to be fast
+            mixed_wav, _ = torch.load(self.mixed_wav_list[idx])
+
             target_mag = torch.load(self.target_mag_list[idx])
+            target_phase = torch.load(self.target_phase_list[idx])
+
             mixed_mag = torch.load(self.mixed_mag_list[idx])
-            return dvec_mel, target_mag, mixed_mag
+            mixed_phase = torch.load(self.mixed_phase_list[idx])
+            return dvec_mel, target_mag, mixed_mag, target_phase, mixed_phase,mixed_wav
         else:
             target_wav, _ = librosa.load(self.target_wav_list[idx], self.hp.audio.sample_rate)
             mixed_wav, _ = librosa.load(self.mixed_wav_list[idx], self.hp.audio.sample_rate)
