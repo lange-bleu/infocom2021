@@ -117,7 +117,7 @@ if __name__ == '__main__':
         raise Exception("Please provide directory of data")
 
     if args.libri_dir is not None:
-        train_folders = [x for x in glob.glob(os.path.join(args.libri_dir, 'train-clean-360', '*'))
+        train_folders = [x for x in glob.glob(os.path.join(args.libri_dir, 'train-clean-100', '*'))
                             if os.path.isdir(x)]
         # [x for x in glob.glob(os.path.join(args.libri_dir, 'train-clean-100', '*'))
         #                     if os.path.isdir(x)] + \
