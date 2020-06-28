@@ -63,19 +63,16 @@ def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp,
                     dvec_list.append(dvec)
                 dvec = torch.stack(dvec_list, dim=0)
                 dvec = dvec.detach()
-
+                
                 mask = model(mixed_mag, dvec)
-                purified_mag = mixed_mag * mask
 
                 # modified code
-                # purified_mag = purified_mag.cpu().detach().numpy()
-                # mixed_phase = mixed_phase.cpu().detach().numpy()
-
+                
                 # consider the dimension bring by batch size
                 # print(purified_mag.shape, mixed_phase.shape)
                 # (6, 301, 601) => 6 is batch size
-                purified_wav = audio.batchspec2wav(purified_mag, mixed_phase)
-
+                purified_wav = audio.batchspec2wav(mask, mixed_phase)
+                
                 # purified_wav=audio.spec2wav(purified_mag, mixed_phase)
                 # print(mixed_wav.shape) [6, 48000]
                 # mixed_wav = mixed_wav.detach().numpy()
