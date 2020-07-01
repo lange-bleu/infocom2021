@@ -1,6 +1,6 @@
 # Infocom2021
 Flowchartof the AI network.
-![](./assets/FlowchartNetwork.png)
+![](./assets/Flowchart.png)
 
 # VoiceFilter
 
