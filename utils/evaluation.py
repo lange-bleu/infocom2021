@@ -19,9 +19,9 @@ def validate(audio, model, embedder, testloader, writer, step):
             dvec = embedder(dvec_mel)
             dvec = dvec.unsqueeze(0)
             purify_mask = model(mixed_mag, dvec)
-            purified_mag = purify_mask * mixed_mag
+            # purified_mag = purify_mask * mixed_mag
             # purified_wav = audio.batchspec2wav(est_mag, mixed_phase)
-            purified_wav = audio.tensorspec2wav(purified_mag[0,:,:], mixed_phase) # eliminate batch dim
+            purified_wav = audio.tensorspec2wav(purify_mask[0,:,:], mixed_phase) # eliminate batch dim
             mixed_wav = torch.from_numpy(mixed_wav).float().cuda()
             denoised_wav = purified_wav + mixed_wav
             denoised_mag = audio.tensorwav2spec(denoised_wav)
