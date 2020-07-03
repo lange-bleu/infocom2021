@@ -13,6 +13,7 @@ from model.embedder import SpeechEmbedder
 
 def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp, hp_str):
     # load embedder
+    torch.cuda.set_device(args.gpu)
     embedder_pt = torch.load(args.embedder_path)
     embedder = SpeechEmbedder(hp).cuda()
     embedder.load_state_dict(embedder_pt)

@@ -23,6 +23,8 @@ if __name__ == '__main__':
                         help="Name of the model. Used for both logging and saving checkpoints.")
     parser.add_argument('-l', '--loss', type=str, required=True, default='power',
                         help="Name of the loss function. Used for loss function selection.")
+    parser.add_argument('-g', '--gpu', type=int, required=True, default='1',
+                        help="ID of the selected gpu. Used for gpu selection.")
     args = parser.parse_args()
 
     hp = HParam(args.config)
