@@ -83,8 +83,22 @@ def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp,
                 output = audio.batchwav2spec(denoised_wav)
                 # output = torch.pow(torch.clamp(output, min=0.0), hp.audio.power)
                 # target_mag = torch.pow(torch.clamp(target_mag, min=0.0), hp.audio.power)
-                loss = criterion(output, target_mag)
-
+                
+                ## two types of loss function
+                if args.loss == "mse":
+                    loss = criterion(output, target_mag)
+                # Power-law compression
+                else: 
+                    magnitude_loss = criterion(
+                        torch.pow(torch.abs(output), hp.audio.power), 
+                        torch.pow(torch.abs(target_mag), hp.audio.power),
+                    )
+                    complex_loss = criterion(
+                        torch.pow(torch.clamp(output, min=0.0), hp.audio.power), 
+                        torch.pow(torch.clamp(target_mag, min=0.0), hp.audio.power),
+                    )
+                    loss = magnitude_loss + complex_loss * hp.train.complex_loss_ratio
+                
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
