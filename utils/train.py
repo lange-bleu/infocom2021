@@ -71,13 +71,13 @@ def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp,
                 # consider the dimension bring by batch size
                 # print(purified_mag.shape, mixed_phase.shape)
                 # (6, 301, 601) => 6 is batch size
-                purified_wav = audio.batchspec2wav(mask, mixed_phase)
+                audio_mask = audio.batchspec2wav(mask, mixed_phase)
                 
                 # purified_wav=audio.spec2wav(purified_mag, mixed_phase)
                 # print(mixed_wav.shape) [6, 48000]
                 # mixed_wav = mixed_wav.detach().numpy()
                 mixed_wav = torch.from_numpy(mixed_wav).float().cuda()
-                denoised_wav=purified_wav+mixed_wav
+                denoised_wav=audio_mask+mixed_wav
                 # print(denoised_wav.shape) [6, 48000]
                 # output, _ = audio.wav2spec(denoised_wav)
                 output = audio.batchwav2spec(denoised_wav)
