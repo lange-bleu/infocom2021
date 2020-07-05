@@ -47,15 +47,7 @@ class Audio():
         """
         spectrograms = list()
         for wav in wavs:
-            # D = self.tensorstft(wav)  # D.size() = (601, 301, 2)
-            # absD = torch.sqrt(torch.square(D[:,:,0]) + torch.square(D[:,:,1]))
-            # S = self.tensoramp_to_db(absD) - self.hp.audio.ref_level_db
-            # S = self.tensornormalize(S)
-            # S = torch.transpose(S, 0, 1)
             S = self.tensorwav2spec(wav)
-            # S = self.amp_to_db(np.abs(D)) - self.hp.audio.ref_level_db
-            # S, D = self.normalize(S), np.angle(D)
-            # S, D = S.T, D.T  # to make [time, freq]
             spectrograms.append(S)
         spectrograms = torch.stack(spectrograms, dim=0)
         return spectrograms
@@ -89,13 +81,6 @@ class Audio():
         """
         wav_list = list()
         for spectrogram, phase in zip(spectrograms, phases):
-            # spectrogram = torch.transpose(spectrogram, 0, 1)
-            # phase = torch.transpose(phase, 0, 1)
-            # # spectrogram, phase = spectrogram.T, phase.T
-            # S = self.tensordb_to_amp(self.tensordenormalize(spectrogram) + self.hp.audio.ref_level_db)
-            # # wav = self.istft(S, phase)
-            # wav = self.tensoristft(S, phase)
-            # wav_list.append(wav)
             wav = self.tensorspec2wav(spectrogram, phase)
             wav_list.append(wav)
         wav_list = torch.stack(wav_list, dim=0)
