@@ -4,6 +4,12 @@ Flowchartof the AI network.
 v3
 
 ![](./assets/Flowchart.png)
+## Schedule
+
+| Period | chenning | hanqing |
+| ------ | ------ | ------ |
+| 0701-0703 | Power loss[x]| Reproduction [x]|
+| 0704-0704 |       |Code Review, dataset Production|
 
 # VoiceFilter
 
@@ -149,4 +155,3 @@ This repository contains codes adapted/copied from the followings:
 - [utils/audio.py](./utils/audio.py) from https://github.com/keithito/tacotron (MIT License)
 - [utils/hparams.py](./utils/hparams.py) from https://github.com/HarryVolek/PyTorch_Speaker_Verification (No License specified)
 - [utils/normalize-resample.sh](./utils/normalize-resample.sh.) from https://unix.stackexchange.com/a/216475
-# infocom2021

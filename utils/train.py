@@ -13,6 +13,7 @@ from model.embedder import SpeechEmbedder
 
 def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp, hp_str):
     # load embedder
+    torch.cuda.set_device(args.gpu)
     embedder_pt = torch.load(args.embedder_path)
     embedder = SpeechEmbedder(hp).cuda()
     embedder.load_state_dict(embedder_pt)
@@ -69,8 +70,23 @@ def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp,
                 mixed_wav = torch.from_numpy(mixed_wav).float().cuda()
                 denoised_wav=audio_mask+mixed_wav
                 output = audio.batchwav2spec(denoised_wav)
-                loss = criterion(output, target_mag)
 
+                
+                ## two types of loss function
+                if args.loss == "mse":
+                    loss = criterion(output, target_mag)
+                # Power-law compression
+                else: 
+                    magnitude_loss = criterion(
+                        torch.abs(torch.pow(output, hp.audio.power)), 
+                        torch.abs(torch.pow(target_mag, hp.audio.power)),
+                    )
+                    complex_loss = criterion(
+                        torch.pow(output, hp.audio.power), 
+                        torch.pow(target_mag, hp.audio.power),
+                    )
+                    loss = magnitude_loss + complex_loss * hp.train.complex_loss_ratio
+                
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()

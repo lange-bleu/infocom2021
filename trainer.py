@@ -13,14 +13,18 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-b', '--base_dir', type=str, default='.',
                         help="Root directory of run.")
-    parser.add_argument('-c', '--config', type=str, required=True,
+    parser.add_argument('-c', '--config', type=str, required=True, default='config/config.yaml',
                         help="yaml file for configuration")
-    parser.add_argument('-e', '--embedder_path', type=str, required=True,
+    parser.add_argument('-e', '--embedder_path', type=str, required=True, default=' model/embedder.pt',
                         help="path of embedder model pt file")
     parser.add_argument('--checkpoint_path', type=str, default=None,
                         help="path of checkpoint pt file")
     parser.add_argument('-m', '--model', type=str, required=True,
                         help="Name of the model. Used for both logging and saving checkpoints.")
+    parser.add_argument('-l', '--loss', type=str, required=True, default='power',
+                        help="Name of the loss function. Used for loss function selection.")
+    parser.add_argument('-g', '--gpu', type=int, required=True, default='1',
+                        help="ID of the selected gpu. Used for gpu selection.")
     args = parser.parse_args()
 
     hp = HParam(args.config)
