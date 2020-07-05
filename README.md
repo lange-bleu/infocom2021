@@ -1,8 +1,6 @@
 # Infocom2021
 Flowchartof the AI network.
 
-v3
-
 ![](./assets/Flowchart.png)
 ## Schedule
 
@@ -23,7 +21,7 @@ Unofficial PyTorch implementation of Google AI's:
 
 1. Python and packages
 
-    This code was tested on Python 3.6 with PyTorch 1.0.1.
+    This code was tested on Python 3.6 with PyTorch 1.6.
     Other packages can be installed by:
 
     ```bash
@@ -66,7 +64,7 @@ Unofficial PyTorch implementation of Google AI's:
     ```
 #### Tips:
 
-change train_dir and test_dir. Maintain different config.yaml at desktop and server.
+change `train_dir` and `test_dir`. Maintain different `config.yaml` at desktop and server.
 
 1. Preprocess wav files
 
@@ -90,13 +88,16 @@ change train_dir and test_dir. Maintain different config.yaml at desktop and ser
 
     After specifying `train_dir`, `test_dir` at `config.yaml`, run:
     ```bash
-    python trainer.py -c [config yaml] -e [path of embedder pt file] -m [name] -g 1
+    python trainer.py -c [config yaml] -e [path of embedder pt file] -g 1 -l power/mse -m [name]
     ```
     This will create `chkpt/name` and `logs/name` at base directory(`-b` option, `.` in default)
 
 #### Tips:
 
-add `-g` to choose cuda device, default is device 1.
+1. add `-g` to choose cuda device, default is device 1. This arg is required.
+
+2. add `-l` to select loss type, default is power loss. Can switch to mse loss by specifying this arg to mse.
+
 
 1. View tensorboardX
 
@@ -104,18 +105,16 @@ add `-g` to choose cuda device, default is device 1.
     tensorboard --logdir ./logs
     ```
 
-    ![](./assets/tensorboard.png)
-
 1. Resuming from checkpoint
 
     ```bash
-    python trainer.py -c [config yaml] --checkpoint_path [chkpt/name/chkpt_{step}.pt] -e [path of embedder pt file] -m name
+    python trainer.py -c [config yaml] --checkpoint_path [chkpt/name/chkpt_{step}.pt] -e [path of embedder pt file] -g 1 -l power/mse -m name
     ```
 
 ## Evaluate
 
 ```bash
-python inference.py -c [config yaml] -e [path of embedder pt file] --checkpoint_path [path of chkpt pt file] -m [path of mixed wav file] -r [path of reference wav file] -o [output directory]
+python inference.py -c [config yaml] -e [path of embedder pt file] --checkpoint_path [path of chkpt pt file] -m [path of mixed wav file] -r [path of reference wav file] -g 1 -o [output directory]
 ```
 
 ## Possible improvments
