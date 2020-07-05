@@ -7,7 +7,7 @@ Flowchartof the AI network.
 | Period | chenning | hanqing |
 | ------ | ------ | ------ |
 | 0701-0703 | Power loss[x]| Reproduction [x]|
-| 0704-0704 |       |Code Review [x], dataset Production|
+| 0704-0704 |       |Code Review [x], dataset Production [x]|
 
 # VoiceFilter
 
