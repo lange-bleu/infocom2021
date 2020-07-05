@@ -86,7 +86,7 @@ def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp,
                         torch.pow(target_mag, hp.audio.power),
                     )
                     loss = magnitude_loss + complex_loss * hp.train.complex_loss_ratio
-                
+
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
