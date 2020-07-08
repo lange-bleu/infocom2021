@@ -66,24 +66,11 @@ def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp,
                 dvec = dvec.detach()
                 
                 mask = model(mixed_mag, dvec)
-
-                # modified code
-                
-                # consider the dimension bring by batch size
-                # print(purified_mag.shape, mixed_phase.shape)
-                # (6, 301, 601) => 6 is batch size
                 audio_mask = audio.batchspec2wav(mask, mixed_phase)
-                
-                # purified_wav=audio.spec2wav(purified_mag, mixed_phase)
-                # print(mixed_wav.shape) [6, 48000]
-                # mixed_wav = mixed_wav.detach().numpy()
                 mixed_wav = torch.from_numpy(mixed_wav).float().cuda()
                 denoised_wav=audio_mask+mixed_wav
-                # print(denoised_wav.shape) [6, 48000]
-                # output, _ = audio.wav2spec(denoised_wav)
                 output = audio.batchwav2spec(denoised_wav)
-                # output = torch.pow(torch.clamp(output, min=0.0), hp.audio.power)
-                # target_mag = torch.pow(torch.clamp(target_mag, min=0.0), hp.audio.power)
+
                 
                 ## two types of loss function
                 if args.loss == "mse":
@@ -99,7 +86,7 @@ def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp,
                         torch.pow(target_mag, hp.audio.power),
                     )
                     loss = magnitude_loss + complex_loss * hp.train.complex_loss_ratio
-                
+
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()

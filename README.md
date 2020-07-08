@@ -1,12 +1,13 @@
 # Infocom2021
 Flowchartof the AI network.
+
 ![](./assets/Flowchart.png)
 ## Schedule
 
 | Period | chenning | hanqing |
 | ------ | ------ | ------ |
 | 0701-0703 | Power loss[x]| Reproduction [x]|
-| 0704-0704 |       |Code Review, dataset Production|
+| 0704-0704 |       |Code Review [x], dataset Production [x]|
 
 # VoiceFilter
 
@@ -15,39 +16,19 @@ Unofficial PyTorch implementation of Google AI's:
 
 ![](./assets/voicefilter.png)
 
-## Result
-
-- Training took about 20 hours on AWS p3.2xlarge(NVIDIA V100).
-
-### Audio Sample
-
-- Listen to audio sample at webpage: http://swpark.me/voicefilter/
-
-
-### Metric
-
-| Median SDR             | Paper | Ours |
-| ---------------------- | ----- | ---- |
-| before VoiceFilter     |  2.5  |  1.9 |
-| after VoiceFilter      | 12.6  | 10.2 |
-
-![](./assets/sdr-result.png)
-
-- SDR converged at 10, which is slightly lower than paper's.
-
 
 ## Dependencies
 
 1. Python and packages
 
-    This code was tested on Python 3.6 with PyTorch 1.0.1.
+    This code was tested on Python 3.6 with PyTorch 1.6.
     Other packages can be installed by:
 
     ```bash
     pip install -r requirements.txt
     ```
 
-1. Miscellaneous 
+1. Miscellaneous
 
     [ffmpeg-normalize](https://github.com/slhck/ffmpeg-normalize) is used for resampling and normalizing wav files.
     See README.md of [ffmpeg-normalize](https://github.com/slhck/ffmpeg-normalize/blob/master/README.md) for installation.
@@ -81,6 +62,9 @@ Unofficial PyTorch implementation of Google AI's:
     cp default.yaml config.yaml
     vim config.yaml
     ```
+#### Tips:
+
+change `train_dir` and `test_dir`. Maintain different `config.yaml` at desktop and server.
 
 1. Preprocess wav files
 
@@ -90,49 +74,47 @@ Unofficial PyTorch implementation of Google AI's:
     ```
     This will create 100,000(train) + 1000(test) data. (About 160G)
 
+#### Tips:
+
+1. Run `v0 => generator.py` can get `mixed_mag`, `mixed_wav`, `target_mag`, `target_wav`, `d_vector.txt`. Note this `d_vector.txt` is the path of reference audio.
+
+2. Run `v1.0` or `v2.0` `generator.py` can also get `mixed_phase` and `target_phase`.
+
+3. On server side, DO NOT use -p as multi-processor.
 
 ## Train VoiceFilter
-
-1. Get pretrained model for speaker recognition system
-
-    VoiceFilter utilizes speaker recognition system ([d-vector embeddings](https://google.github.io/speaker-id/publications/GE2E/)).
-    Here, we provide pretrained model for obtaining d-vector embeddings.
-
-    This model was trained with [VoxCeleb2](http://www.robots.ox.ac.uk/~vgg/data/voxceleb/vox2.html) dataset,
-    where utterances are randomly fit to time length [70, 90] frames.
-    Tests are done with window 80 / hop 40 and have shown equal error rate about 1%.
-    Data used for test were selected from first 8 speakers of [VoxCeleb1](http://www.robots.ox.ac.uk/~vgg/data/voxceleb/vox1.html) test dataset, where 10 utterances per each speakers are randomly selected.
-    
-    **Update**: Evaluation on VoxCeleb1 selected pair showed 7.4% EER.
-    
-    The model can be downloaded at [this GDrive link](https://drive.google.com/file/d/1YFmhmUok-W76JkrfA0fzQt3c-ZsfiwfL/view?usp=sharing).
 
 1. Run
 
     After specifying `train_dir`, `test_dir` at `config.yaml`, run:
     ```bash
-    python trainer.py -c [config yaml] -e [path of embedder pt file] -m [name]
+    python trainer.py -c [config yaml] -e [path of embedder pt file] -g 1 -l power/mse -m [name]
     ```
     This will create `chkpt/name` and `logs/name` at base directory(`-b` option, `.` in default)
+
+#### Tips:
+
+1. add `-g` to choose cuda device, default is device 1. This arg is required.
+
+2. add `-l` to select loss type, default is power loss. Can switch to mse loss by specifying this arg to mse.
+
 
 1. View tensorboardX
 
     ```bash
     tensorboard --logdir ./logs
     ```
-    
-    ![](./assets/tensorboard.png)
 
 1. Resuming from checkpoint
 
     ```bash
-    python trainer.py -c [config yaml] --checkpoint_path [chkpt/name/chkpt_{step}.pt] -e [path of embedder pt file] -m name
+    python trainer.py -c [config yaml] --checkpoint_path [chkpt/name/chkpt_{step}.pt] -e [path of embedder pt file] -g 1 -l power/mse -m name
     ```
 
 ## Evaluate
 
 ```bash
-python inference.py -c [config yaml] -e [path of embedder pt file] --checkpoint_path [path of chkpt pt file] -m [path of mixed wav file] -r [path of reference wav file] -o [output directory]
+python inference.py -c [config yaml] -e [path of embedder pt file] --checkpoint_path [path of chkpt pt file] -m [path of mixed wav file] -r [path of reference wav file] -g 1 -o [output directory]
 ```
 
 ## Possible improvments
