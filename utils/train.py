@@ -64,29 +64,32 @@ def train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp,
                     dvec_list.append(dvec)
                 dvec = torch.stack(dvec_list, dim=0)
                 dvec = dvec.detach()
-                
+
                 mask = model(mixed_mag, dvec)
+                # print(mask)
                 audio_mask = audio.batchspec2wav(mask, mixed_phase)
                 mixed_wav = torch.from_numpy(mixed_wav).float().cuda()
-                denoised_wav=audio_mask+mixed_wav
+                denoised_wav = audio_mask + mixed_wav
                 output = audio.batchwav2spec(denoised_wav)
 
-                
-                ## two types of loss function
+                # two types of loss function
                 if args.loss == "mse":
                     loss = criterion(output, target_mag)
+                    # print(loss)
                 # Power-law compression
-                else: 
+                else:
                     magnitude_loss = criterion(
-                        torch.abs(torch.pow(output, hp.audio.power)), 
+                        torch.abs(torch.pow(output, hp.audio.power)),
                         torch.abs(torch.pow(target_mag, hp.audio.power)),
                     )
                     complex_loss = criterion(
-                        torch.pow(output, hp.audio.power), 
+                        torch.pow(output, hp.audio.power),
                         torch.pow(target_mag, hp.audio.power),
                     )
-                    loss = magnitude_loss + complex_loss * hp.train.complex_loss_ratio
-
+                    # print(torch.pow(output, hp.audio.power))
+                    # loss = magnitude_loss + complex_loss * hp.train.complex_loss_ratio
+                    loss = magnitude_loss
+                # print(loss)
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
