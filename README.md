@@ -8,7 +8,13 @@ Flowchartof the AI network.
 | ------ | ------ | ------ |
 | 0701-0703 | Power loss[x]| Reproduction [x]|
 | 0704-0704 |       |Code Review [x], dataset Production [x]|
-
+| 0705-0708 | Paper introduction draft & pipeline optimization   [x]   |code v3 [x]|
+| 0709-0711 | System design     |Preliminary on public dataset|
+| 0713-0718 | Finish experimental evaluation     |Finish experimental evaluation|
+| 0720-0725 | Finish user case 1     |Finish user case 1|
+| 0727-0801 | Finish user case 2     |Finish user case 2|
+| 0803-0808 | Paper v1     |Paper v1|
+| 0809-0814 | Paper submission     |Paper submission|
 # VoiceFilter
 
 Unofficial PyTorch implementation of Google AI's:
