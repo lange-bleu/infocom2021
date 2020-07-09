@@ -2,6 +2,27 @@
 Flowchartof the AI network.
 
 ![](./assets/Flowchart.png)
+
+## Version Control
+| Version | Description |
+| ------ | ------ |
+| V0  | Original Version of voicefilter |
+| V1.0  | after * mask, the purified_mag -> istft -> purified_wav -><br> + mixed_wav -> denoised_wav -> stft -> denoised_mag -> loss |
+| V2.0  | put istft into model. model_output -> istft -> audio_mask -><br> + mixed_wav -> denoised_wav -> stft -> denoised_mag -> loss|
+| V3.0  | Use linearity of Fourier Transform, only change * to - operation from V0 |
+| V3.1  | Apply normalization after mixed_mag - noise_mag |
+| V3.2  | Use + operation instead of - compare with v3.1 |
+
+## Dataset path in server
+| Dataset | PATH |
+|--------|-------|
+| train-100|
+|audios after normalize.sh| /srv/node/sdc1/LibriSpeech|
+|spectrograms after generator.py| /srv/node/sdd1/small-processed-audio|
+| train-360|
+|audios after normalize.sh| /srv/node/sdc1/medium-LibriSpeech|
+|spectrograms and phases after v2 generator.py| /srv/node/sdc1/medium-processed-audio|
+
 ## Schedule
 
 | Period | chenning | hanqing |
@@ -27,17 +48,9 @@ Unofficial PyTorch implementation of Google AI's:
 
 1. Python and packages
 
-    This code was tested on Python 3.6 with PyTorch 1.6.
-    Other packages can be installed by:
-
     ```bash
     pip install -r requirements.txt
     ```
-
-1. Miscellaneous
-
-    [ffmpeg-normalize](https://github.com/slhck/ffmpeg-normalize) is used for resampling and normalizing wav files.
-    See README.md of [ffmpeg-normalize](https://github.com/slhck/ffmpeg-normalize/blob/master/README.md) for installation.
 
 ## Prepare Dataset
 
@@ -126,17 +139,3 @@ python inference.py -c [config yaml] -e [path of embedder pt file] --checkpoint_
 ## Possible improvments
 
 - Try power-law compressed reconstruction error as loss function, instead of MSE. (See [#14](https://github.com/mindslab-ai/voicefilter/issues/14))
-
-## Author
-
-[Seungwon Park](http://swpark.me) at MINDsLab (yyyyy@snu.ac.kr, swpark@mindslab.ai)
-
-## License
-
-Apache License 2.0
-
-This repository contains codes adapted/copied from the followings:
-- [utils/adabound.py](./utils/adabound.py) from https://github.com/Luolc/AdaBound (Apache License 2.0)
-- [utils/audio.py](./utils/audio.py) from https://github.com/keithito/tacotron (MIT License)
-- [utils/hparams.py](./utils/hparams.py) from https://github.com/HarryVolek/PyTorch_Speaker_Verification (No License specified)
-- [utils/normalize-resample.sh](./utils/normalize-resample.sh.) from https://unix.stackexchange.com/a/216475
