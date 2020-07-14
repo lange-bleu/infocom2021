@@ -11,8 +11,10 @@ Flowchartof the AI network.
 | V2.0  | put istft into model. model_output -> istft -> audio_mask -><br> + mixed_wav -> denoised_wav -> stft -> denoised_mag -> loss|
 | V3.0  | Use linearity of Fourier Transform, only change * to - operation from V0 |
 | V3.1  | Apply normalization after mixed_mag - noise_mag |
-| V3.1.1  | Change the ground truth to mixed_mag - clean_mag |
+| V3.1.1  | Add 3 different evaluations for wavs based on v3.1|
+| V3.1.2  | Change the ground truth to mixed_mag - clean_mag |
 | V3.2  | Use + operation instead of - compare with v3.1 |
+| V3.2.1  | Add 3 different evaluations for wavs based on v3.2|
 ## Dataset path in server
 | Dataset | PATH |
 |--------|-------|
