@@ -1,6 +1,8 @@
 import speech_recognition as sr
 from os import path
 import jiwer
+from pesq import pesq
+from scipy.io import wavfile
 
 def metric_for_text(text_groundtruth,text_estimated):
     transformation = jiwer.Compose([
@@ -25,6 +27,9 @@ def speech_2_text(wav_groundtruth=path.join(path.dirname(path.realpath(__file__)
     with sr.AudioFile(wav_estimated) as source:
         audio_estimated = r.record(source)
 
+    rate, audio_pesq = wavfile.read(wav_groundtruth)
+    rate, audio_estimated_pesq = wavfile.read(wav_estimated)
+
     if engine_name == 'google':
         GOOGLE_CLOUD_SPEECH_CREDENTIALS_PATH = path.join(path.dirname(path.realpath(__file__)), "key.json")
         with open (GOOGLE_CLOUD_SPEECH_CREDENTIALS_PATH, 'r') as file:
@@ -33,8 +38,9 @@ def speech_2_text(wav_groundtruth=path.join(path.dirname(path.realpath(__file__)
             text_groundtruth=r.recognize_google_cloud (audio, language = "en-us", credentials_json = GOOGLE_CLOUD_SPEECH_CREDENTIALS)
             text_estimated=r.recognize_google_cloud (audio_estimated, language = "en-us", credentials_json = GOOGLE_CLOUD_SPEECH_CREDENTIALS)
             print ("Groundtruth:{0}; Estimated:{1}" .format(text_groundtruth,text_estimated))
+            print(pesq(rate, audio_pesq, audio_estimated_pesq, 'wb'))
             # return the results
-            return metric_for_text(text_groundtruth,text_estimated)
+            return metric_for_text(text_groundtruth,text_estimated), pesq(rate, audio_pesq, audio_estimated_pesq, 'wb')
 
         except sr.UnknownValueError:
             print("Google Cloud Speech could not understand audio")
@@ -115,5 +121,5 @@ if __name__ == '__main__':
 
     # use the audio file as the audio source
     engine_name='google'
-    wer,mer,wil=speech_2_text(wav_groundtruth,wav_estimated,engine_name)
-    print("Metrics: {0},{1},{2}".format(wer,mer,wil))
+    [wer,mer,wil],pesq_value=speech_2_text(wav_groundtruth,wav_estimated,engine_name)
+    print("wer: {0}, mer: {1}, wil: {2}, pesq: {3}".format(wer,mer,wil,pesq_value))
