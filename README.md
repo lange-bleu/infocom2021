@@ -3,7 +3,20 @@ Flowchartof the AI network.
 
 ![](./assets/Flowchart.png)
 
+## Deployment Guidance (python 3 preferred)
+
+### Google API + [WER/MER/WIL Metric](https://pypi.org/project/jiwer/)
+
+pip install SpeechRecognition google-cloud-speech google-api-python-client oauth2client jiwer
+
+Test: cd utils && python speech2text.py
+
+### [SDR/SIR/SAR Metric](https://craffel.github.io/mir_eval/#mir_eval.separation.bss_eval_sources)
+
+sdr,sir,sar = mir_eval.separation.bss_eval_sources(reference_sources, estimated_sources, compute_permutation=True)
+
 ## Version Control
+
 | Version | Description |
 | ------ | ------ |
 | V0  | Original Version of voicefilter |
@@ -15,7 +28,9 @@ Flowchartof the AI network.
 | V3.1.2  | Change the ground truth to mixed_mag - clean_mag |
 | V3.2  | Use + operation instead of - compare with v3.1 |
 | V3.2.1  | Add 3 different evaluations for wavs based on v3.2|
+
 ## Dataset path in server
+
 | Dataset | PATH |
 |--------|-------|
 | train-100|
