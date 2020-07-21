@@ -287,7 +287,7 @@ if __name__ == '__main__':
         raise Exception("Please provide directory of data")
 
     if args.libri_dir is not None:
-        train_folders = [x for x in glob.glob(os.path.join(args.libri_dir, 'train-clean-100', '*'))
+        train_folders = [x for x in glob.glob(os.path.join(args.libri_dir, 'train-clean-360', '*'))
                          if os.path.isdir(x)]
         # [x for x in glob.glob(os.path.join(args.libri_dir, 'train-clean-100', '*'))
         #                     if os.path.isdir(x)] + \
@@ -315,7 +315,7 @@ if __name__ == '__main__':
 
     test_spk = [x for x in test_spk if len(x) >= 2]  # list of list, each speaker has a list of wavs
 
-    selected_spk = ['84']
+    selected_spk = ['84', '174', '422']
     specific_spk = []
     rest_spk = []
     for spk in test_spk:
@@ -331,7 +331,14 @@ if __name__ == '__main__':
         spk1, spk2 = random.sample(train_spk, 2)
         s1_dvec, s1_target = random.sample(spk1, 2)
         s2 = random.choice(spk2)
-        mix_joint2(hp, args, audio, num, s1_dvec, s1_target, s2, train=True)
+        SNR = random.choice([0, 10, 20])
+        mix_joint2(hp, args, audio, num, s1_dvec, s1_target, s2, SNR=SNR, train=True)
+        mix_conversation2(hp, args, audio, num, s1_dvec, s1_target, s2, train=True)
+        noise_source = glob.glob('./noise_source/*')
+        noise_mat = random.choice(noise_source)
+        noise_type = noise_mat.split('/')[-1][:-4]
+
+        mix_noise(hp, args, audio, num, s1_dvec, s1_target, noise_mat, noise_type, SNR, train=True)
 
 
     def test_wrapper(num):
@@ -347,13 +354,12 @@ if __name__ == '__main__':
         noise_source = glob.glob('./noise_source/*')
         noise_mat = random.choice(noise_source)
         noise_type = noise_mat.split('/')[-1][:-4]
-
         mix_noise(hp, args, audio, num, s1_dvec, s1_target, noise_mat, noise_type, SNR, train=False)
-    # arr = list(range(10 ** 5))
-    # with Pool(cpu_num) as p:
-    #     r = list(tqdm.tqdm(p.imap(train_wrapper, arr), total=len(arr)))
-
     arr = list(range(10 ** 2))
+    with Pool(cpu_num) as p:
+        r = list(tqdm.tqdm(p.imap(train_wrapper, arr), total=len(arr)))
+
+    # arr = list(range(10 ** 2))
     arr = list(range(10))
     with Pool(cpu_num) as p:
         r = list(tqdm.tqdm(p.imap(test_wrapper, arr), total=len(arr)))
