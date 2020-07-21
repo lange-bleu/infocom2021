@@ -355,7 +355,7 @@ if __name__ == '__main__':
         noise_mat = random.choice(noise_source)
         noise_type = noise_mat.split('/')[-1][:-4]
         mix_noise(hp, args, audio, num, s1_dvec, s1_target, noise_mat, noise_type, SNR, train=False)
-    arr = list(range(3 * 10 ** 4))
+    arr = list(range(10 ** 4))
     with Pool(cpu_num) as p:
         r = list(tqdm.tqdm(p.imap(train_wrapper, arr), total=len(arr)))
 
