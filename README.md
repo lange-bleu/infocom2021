@@ -22,7 +22,7 @@ sdr,sir,sar = mir_eval.separation.bss_eval_sources(reference_sources, estimated_
 | V0  | Original Version of voicefilter |
 | V1.0  | after * mask, the purified_mag -> istft -> purified_wav -><br> + mixed_wav -> denoised_wav -> stft -> denoised_mag -> loss |
 | V2.0  | put istft into model. model_output -> istft -> audio_mask -><br> + mixed_wav -> denoised_wav -> stft -> denoised_mag -> loss|
-| V2.1  | change normalize function in stft |
+| V2.1  | ~~change normalize function in stft~~ |
 | V3.0  | Use linearity of Fourier Transform, only change * to - operation from V0 |
 | V3.1  | Apply normalization after mixed_mag - noise_mag |
 | V3.1.1  | Add 3 different evaluations for wavs based on v3.1|
@@ -30,6 +30,7 @@ sdr,sir,sar = mir_eval.separation.bss_eval_sources(reference_sources, estimated_
 | V3.2  | Use + operation instead of - compare with v3.1 |
 | V3.2.1  | Add 3 different evaluations for wavs based on v3.2|
 | V3.2.2  | Add generator2, new dataloader based on v3.2.1|
+| V3.2.3  | Use plus to train hide my voice|
 
 ## Dataset path in server
 
@@ -37,10 +38,12 @@ sdr,sir,sar = mir_eval.separation.bss_eval_sources(reference_sources, estimated_
 |--------|-------|
 | train-100|
 |audios after normalize.sh| /srv/node/sdc1/LibriSpeech|
-|spectrograms after generator.py| /srv/node/sdd1/small-processed-audio|
+|spectrograms after generator.py| ~~/srv/node/sdd1/small-processed-audio~~|
 | train-360|
 |audios after normalize.sh| /srv/node/sdc1/medium-LibriSpeech|
 |spectrograms and phases after v2 generator.py| /srv/node/sdc1/medium-processed-audio|
+|New dataset|
+|New dataset based on train-360|/srv/node/sdd1/new-processed-audio|
 
 ## Schedule
 
