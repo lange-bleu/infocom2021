@@ -29,8 +29,8 @@ sdr,sir,sar = mir_eval.separation.bss_eval_sources(reference_sources, estimated_
 | V3.1.2  | Change dataloader, get new_target_wav = mixed_wav - target_wav|
 | V3.2  | ~~Use + operation instead of - compare with v3.1~~|
 | V3.2.1  | Add 3 different evaluations for wavs based on v3.2|
-| V3.2.2  | Add generator2, new dataloader based on v3.2.1|
-| V3.2.3  | Use plus to train hide my voice|
+| V3.2.2  | ~~Add generator2, new dataloader based on v3.2.1~~|
+| V3.2.3  | Use plus to train hide my voice, add dataloader option for old and new dataset|
 
 ## Dataset path in server
 
