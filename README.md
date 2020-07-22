@@ -20,14 +20,14 @@ sdr,sir,sar = mir_eval.separation.bss_eval_sources(reference_sources, estimated_
 | Version | Description |
 | ------ | ------ |
 | V0  | Original Version of voicefilter |
-| V1.0  | after * mask, the purified_mag -> istft -> purified_wav -><br> + mixed_wav -> denoised_wav -> stft -> denoised_mag -> loss |
-| V2.0  | put istft into model. model_output -> istft -> audio_mask -><br> + mixed_wav -> denoised_wav -> stft -> denoised_mag -> loss|
+| V1.0  | ~~after * mask, the purified_mag -> istft -> purified_wav -><br> + mixed_wav -> denoised_wav -> stft -> denoised_mag -> loss~~ |
+| V2.0  | ~~put istft into model. model_output -> istft -> audio_mask -><br> + mixed_wav -> denoised_wav -> stft -> denoised_mag -> loss~~|
 | V2.1  | ~~change normalize function in stft~~ |
-| V3.0  | Use linearity of Fourier Transform, only change * to - operation from V0 |
+| V3.0  | ~~Use linearity of Fourier Transform, only change * to - operation from V0~~ |
 | V3.1  | Apply normalization after mixed_mag - noise_mag |
-| V3.1.1  | Add 3 different evaluations for wavs based on v3.1|
+| V3.1.1  | ~~Add 3 different evaluations for wavs based on v3.1~~|
 | V3.1.2  | Change dataloader, get new_target_wav = mixed_wav - target_wav|
-| V3.2  | Use + operation instead of - compare with v3.1 |
+| V3.2  | ~~Use + operation instead of - compare with v3.1~~|
 | V3.2.1  | Add 3 different evaluations for wavs based on v3.2|
 | V3.2.2  | Add generator2, new dataloader based on v3.2.1|
 | V3.2.3  | Use plus to train hide my voice|
