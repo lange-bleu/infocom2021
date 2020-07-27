@@ -331,7 +331,7 @@ if __name__ == '__main__':
         spk1, spk2 = random.sample(train_spk, 2)
         s1_dvec, s1_target = random.sample(spk1, 2)
         s2 = random.choice(spk2)
-        SNR = random.choice([0, 10, 20])
+        SNR = random.choice([-20, -10, 0, 10, 20])
         mix_joint2(hp, args, audio, num, s1_dvec, s1_target, s2, SNR=SNR, train=True)
         mix_conversation2(hp, args, audio, num, s1_dvec, s1_target, s2, train=True)
         noise_source = glob.glob('./noise_source/*')
@@ -348,16 +348,16 @@ if __name__ == '__main__':
 
         s1_dvec, s1_target = random.sample(spk1, 2)
         s2 = random.choice(spk2)
-        SNR = random.choice([0, 10, 20])
+        SNR = random.choice([-20, -10, 0, 10, 20])
         mix_joint2(hp, args, audio, num, s1_dvec, s1_target, s2, SNR=SNR, train=False)
         mix_conversation2(hp, args, audio, num, s1_dvec, s1_target, s2, train=False)
         noise_source = glob.glob('./noise_source/*')
         noise_mat = random.choice(noise_source)
         noise_type = noise_mat.split('/')[-1][:-4]
         mix_noise(hp, args, audio, num, s1_dvec, s1_target, noise_mat, noise_type, SNR, train=False)
-    arr = list(range(10 ** 4))
-    with Pool(cpu_num) as p:
-        r = list(tqdm.tqdm(p.imap(train_wrapper, arr), total=len(arr)))
+    # arr = list(range(10 ** 4))
+    # with Pool(cpu_num) as p:
+    #     r = list(tqdm.tqdm(p.imap(train_wrapper, arr), total=len(arr)))
 
     # arr = list(range(10 ** 2))
     arr = list(range(10**2))
