@@ -1,0 +1,4 @@
+主函数：plateAMattackOkgoogle.m 实现AM调制和控制waveform激励
+这里的函数发生器是：Keysight Technologies 33500B Series Waveform Generators
+程序里面的一些fscan, fprintf就是对函数发生器进行的读写命令
+接口数据线是 GPIB-USB
