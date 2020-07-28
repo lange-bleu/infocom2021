@@ -10,7 +10,7 @@ logs/
 test/test_data/
 enhance_my_voice/
 hide_my_voice/
-
+*.asv
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
