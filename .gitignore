@@ -8,6 +8,8 @@ temp/
 chkpt/
 logs/
 test/test_data/
+enhance_my_voice/
+hide_my_voice/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

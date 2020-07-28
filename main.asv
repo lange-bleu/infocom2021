@@ -15,7 +15,7 @@ tic
 %% Initialization
 flagNewTest = 1;
 aFs = 4;
-% [mixed_audio,Fs] = audioread('speakerA.wav');
+[mixed_audio,Fs] = audioread('speakerA.wav');
 % OkGoogle1 = OkGoogle(2.1e5:3.1e5,2);
 % 
 % % [HeyXiaoE,Fs] = audioread('interviewÄãºÃÐ¡E.m4a');
@@ -33,7 +33,7 @@ aFs = 4;
 %     pyversion D:\software\Anaconda3\envs\py3.6\python.exe
 % end
 % 
-mixed_audio_path='utils/speakerA.wav';
+% mixed_audio_path='utils/speakerA.wav';
 % 
 % args_info = py.dict(pyargs('config' , 'config/config.yaml',...
 %     'embedder_path','model/embedder.pt',...
@@ -73,33 +73,30 @@ soundsc(y, fs);
 % if count(python_path, module_path) == 0
 %     insert(python_path, int32(0), module_path);
 % end
-% 
-% if count(py.sys.path,'D:\\papers\\infocom2021') == 0
-%     insert(py.sys.path,int32(0),'D:\\papers\\infocom2021');
-% end
-% py.print('hello, python!')
+
+if count(py.sys.path,'D:\\papers\\infocom2021') == 0
+    insert(py.sys.path,int32(0),'D:\\papers\\infocom2021');
+end
+py.print('hello, python!')
 
 % py.importlib.import_module('utils.hparams')
 % import py.utils.hparams.HParam
 
-% mask_audio = py.inference_matlab.main(args_info);
+mask_audio = py.inference_matlab.main(args_info);
 
-mask_audio=y;
 %% emit ultrasound
 lengthpuresignal = length(mask_audio);
 lengthzeros = 1e4;
 r = lengthzeros/2/lengthpuresignal; % r for generate tukey window
 mask_audio = [zeros(lengthzeros,1);mask_audio;zeros(lengthzeros,1)];
 
-lengthpuresignal = length(mask_audio);
+lengthpuresignal = length(mixed_audio);
 lengthzeros = 1e4;
 r = lengthzeros/2/lengthpuresignal; % r for generate tukey window
-mask_audio = [zeros(lengthzeros,1);mask_audio;zeros(lengthzeros,1)];
-
-
-Fs = 48e3;
+mixed_audio = [zeros(lengthzeros,1);mixed_audio;zeros(lengthzeros,1)];
 
 sRate = aFs*Fs;
+
 % parameters of 33500 waveform generator
 Address_33500 = '10';
 sRate_33500 = sRate;
@@ -113,7 +110,7 @@ pausePeriod = 10; % s
 
 
 %interpolation
-x = (1:length(mask_audio))';
+x = (1:length(OkGoogle1))';
 xi = (1/aFs:1/aFs:length(OkGoogle1))';
 % yi = OkGoogle1;
 % yi = yi/max(abs(yi));
