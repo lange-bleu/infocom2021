@@ -48,7 +48,7 @@ fprintf(fgen, '*WAI');   % Make sure no other commands are exectued until arb is
 
 command = ['SOURce1:FUNCtion:ARBitrary ' name];
 fprintf(fgen,command); % set current arb waveform to defined arb testrise
-command = ['MMEM:STOR:DATA1 "INT:\555\' name '.arb"']; %store arb in intermal NV memory
+command = ['MMEM:STOR:DATA1 "INT:\' name '.arb"']; %store arb in intermal NV memory
 fprintf(fgen,command);
 % 
 % command = ['SOURCE1:FUNCtion:ARB:SRATe ' num2str(sRate)]; %create sample rate command

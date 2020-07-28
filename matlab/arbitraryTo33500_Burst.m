@@ -21,9 +21,9 @@ fprintf (fgen, '*RST');
 % command = ['SOURce1:FUNCtion:ARBitrary ' name];
 % %fprintf(fgen,'SOURce1:FUNCtion:ARBitrary GPETE'); % set current arb waveform to defined arb testrise
 % fprintf(fgen,command); % set current arb waveform to defined arb testrise
-command = ['MMEM:LOAD:DATA1 "INT:\555\' name '.arb"'];%store arb in intermal NV memory
+command = ['MMEM:LOAD:DATA1 "INT:\' name '.arb"'];%store arb in intermal NV memory
 fprintf(fgen,command);
-command = ['SOURce1:FUNCtion:ARBitrary "INT:\555\' name '.arb"'];
+command = ['SOURce1:FUNCtion:ARBitrary "INT:\' name '.arb"'];
 fprintf(fgen,command);
 % MMEM:LOAD:DATA "Int:\Builtin\HAVERSINE.arb"
 % FUNC:ARB "Int:\Builtin\HAVERSINE.ARB"

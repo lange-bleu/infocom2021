@@ -12,41 +12,13 @@ clc
 clear
 close all
 tic
-%% Initialization
-flagNewTest = 1;
-aFs = 4;
-[mixed_audio,Fs] = audioread('speakerA.wav');
-% OkGoogle1 = OkGoogle(2.1e5:3.1e5,2);
-% 
-% % [HeyXiaoE,Fs] = audioread('interviewÄãºÃÐ¡E.m4a');
-% % HeyXiaoE1 = HeyXiaoE(9524:26160,2);
-% 
-% lengthpuresignal = length(OkGoogle1);
-% lengthzeros = 1e4;
-% r = lengthzeros/2/lengthpuresignal; % r for generate tukey window
-% OkGoogle1 = [zeros(lengthzeros,1);OkGoogle1;zeros(lengthzeros,1)];
 
-%% set python env
-% pe = pyversion('executable','D:\software\Anaconda3\envs\py3.6\python.exe');
-% [v, e, isloaded] = pyversion;
-% if ~isloaded
-%     pyversion D:\software\Anaconda3\envs\py3.6\python.exe
-% end
+mixed_audio_path='utils/speakerA.wav';
 % 
-% mixed_audio_path='utils/speakerA.wav';
-% 
-% args_info = py.dict(pyargs('config' , 'config/config.yaml',...
-%     'embedder_path','model/embedder.pt',...
-%     "checkpoint_path", 'enhance_my_voice/chkpt_201000.pt',...
-%     'mixed_file','utils/speakerA.wav',...
-%     'reference_file',mixed_audio_path,...
-%     'out_dir','output'));
-% 
-% args_info=struct(args_info);
 
 %% play mixed_audio
-[y, fs] = audioread(mixed_audio_path);
-soundsc(y, fs);
+[y, Fs] = audioread(mixed_audio_path);
+% soundsc(y, fs);
 %% add noise
 % subplot(2, 1, 1);
 % plot(y, 'b-');
@@ -66,34 +38,12 @@ soundsc(y, fs);
 % drawnow;
 % soundsc(yNoisy, fs);
 
-%% retrieve mask_audio via python module
-% [own_path, ~, ~] = fileparts(mfilename('fullpath'));
-% module_path = fullfile(own_path, '..');
-% python_path = py.sys.path;
-% if count(python_path, module_path) == 0
-%     insert(python_path, int32(0), module_path);
-% end
+mask_audio=y;
 
-if count(py.sys.path,'D:\\papers\\infocom2021') == 0
-    insert(py.sys.path,int32(0),'D:\\papers\\infocom2021');
-end
-py.print('hello, python!')
-
-% py.importlib.import_module('utils.hparams')
-% import py.utils.hparams.HParam
-
-mask_audio = py.inference_matlab.main(args_info);
-
-%% emit ultrasound
-lengthpuresignal = length(mask_audio);
-lengthzeros = 1e4;
-r = lengthzeros/2/lengthpuresignal; % r for generate tukey window
-mask_audio = [zeros(lengthzeros,1);mask_audio;zeros(lengthzeros,1)];
-
-lengthpuresignal = length(mixed_audio);
-lengthzeros = 1e4;
-r = lengthzeros/2/lengthpuresignal; % r for generate tukey window
-mixed_audio = [zeros(lengthzeros,1);mixed_audio;zeros(lengthzeros,1)];
+%% pre-processing
+flagNewTest = 1;
+aFs = 4;
+% Fs = 48e3;
 
 sRate = aFs*Fs;
 
@@ -110,11 +60,11 @@ pausePeriod = 10; % s
 
 
 %interpolation
-x = (1:length(OkGoogle1))';
-xi = (1/aFs:1/aFs:length(OkGoogle1))';
+x = (1:length(mask_audio))';
+xi = (1/aFs:1/aFs:length(mask_audio))';
 % yi = OkGoogle1;
 % yi = yi/max(abs(yi));
-yi = interp1q(x,OkGoogle1,xi)';
+yi = interp1q(x,mask_audio,xi)';
 yi = yi/abs(max(yi));
 % lengthArb = length(yi);
 lengthArb = length(yi);
@@ -126,7 +76,7 @@ instrreset;
 fgen = LinkTo33500_GPIB(Address_33500,lengthArb);
 
 %% Sweeping Measurement
-name = 'AOkGoogle';
+name = 'mask_audio_raw';
 if flagNewTest~=0
     waveSendErrorBit = arbitraryTo33500_WaveformSend(yi,fgen,name);
     if ~waveSendErrorBit % if exciting works
