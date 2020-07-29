@@ -39,11 +39,15 @@ mixed_audio_path='utils/speakerA.wav';
 % soundsc(yNoisy, fs);
 
 mask_audio=y;
-
-%% pre-processing
+%%
 flagNewTest = 1;
 aFs = 4;
-% Fs = 48e3;
+
+lengthpuresignal = length(mask_audio);
+lengthzeros = 1e4;
+r = lengthzeros/2/lengthpuresignal; % r for generate tukey window
+mask_audio = [zeros(lengthzeros,1);mask_audio;zeros(lengthzeros,1)];
+
 
 sRate = aFs*Fs;
 
@@ -55,17 +59,21 @@ ampExcite = 8.5; % Vpp
 % delta_f = 1e2;
 % f_start = 24.7e3;
 % numFreqs = (f_end - f_start)/delta_f + 1;
-burstPeriod = 5; % s
+burstPeriod = 8; % s
 pausePeriod = 10; % s
 
 
 %interpolation
 x = (1:length(mask_audio))';
 xi = (1/aFs:1/aFs:length(mask_audio))';
-% yi = OkGoogle1;
+
+% yi = mask_audio;
 % yi = yi/max(abs(yi));
+
 yi = interp1q(x,mask_audio,xi)';
+yi(isnan(yi))=0;
 yi = yi/abs(max(yi));
+
 % lengthArb = length(yi);
 lengthArb = length(yi);
 t = (1:lengthArb)/sRate_33500;
@@ -76,7 +84,7 @@ instrreset;
 fgen = LinkTo33500_GPIB(Address_33500,lengthArb);
 
 %% Sweeping Measurement
-name = 'mask_audio_raw';
+name = 'maskAudio';
 if flagNewTest~=0
     waveSendErrorBit = arbitraryTo33500_WaveformSend(yi,fgen,name);
     if ~waveSendErrorBit % if exciting works

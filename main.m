@@ -17,7 +17,7 @@ mixed_audio_path='utils/speakerA.wav';
 % 
 
 %% play mixed_audio
-[y, fs] = audioread(mixed_audio_path);
+[y, Fs] = audioread(mixed_audio_path);
 % soundsc(y, fs);
 %% add noise
 % subplot(2, 1, 1);
@@ -43,65 +43,114 @@ mask_audio=y;
 %% pre-processing
 flagNewTest = 1;
 aFs = 4;
-Fs = 48e3;
+
+lengthpuresignal = length(mask_audio);
+lengthzeros = 1e4;
+r = lengthzeros/2/lengthpuresignal; % r for generate tukey window
+mask_audio = [zeros(lengthzeros,1);mask_audio;zeros(lengthzeros,1)];
+
 
 sRate = aFs*Fs;
 
-% parameters of 33500 waveform generator
+%% parameters of 33500 waveform generator
 Address_33500 = '10';
 sRate_33500 = sRate;
-ampExcite = 8.5; % Vpp
-% f_end = 25.3e3; % sweep frequency Hz
-% delta_f = 1e2;
-% f_start = 24.7e3;
-% numFreqs = (f_end - f_start)/delta_f + 1;
-burstPeriod = 5; % s
-pausePeriod = 10; % s
+ampExcite = 9; % Vpp
+% f_end = 28e3; % sweep frequency Hz
+% delta_f = 100e2;
+% f_start = 28e3;
+% fvect = f_start:delta_f:f_end;
+fvect = [27.1].*1e3;
+numFreqs = length(fvect);
+burstPeriod = 8; % s
+pausePeriod = 16; % s
 
 
-%interpolation
+%% interpolation
 x = (1:length(mask_audio))';
 xi = (1/aFs:1/aFs:length(mask_audio))';
-% yi = OkGoogle1;
-% yi = yi/max(abs(yi));
+
 yi = interp1q(x,mask_audio,xi)';
+yi(isnan(yi))=0;
 yi = yi/abs(max(yi));
-% lengthArb = length(yi);
+
 lengthArb = length(yi);
 t = (1:lengthArb)/sRate_33500;
+
+% for AM modulation
+m = 0.8;
 
 %% Link
 % Clear MATLAB workspace of any previous instrument connections
 instrreset;
 fgen = LinkTo33500_GPIB(Address_33500,lengthArb);
 
+name = 'maskUltra';
 %% Sweeping Measurement
-name = 'AOkGoogle';
 if flagNewTest~=0
-    waveSendErrorBit = arbitraryTo33500_WaveformSend(yi,fgen,name);
-    if ~waveSendErrorBit % if exciting works
+    % create waitbar for sweeping
+    hwait = waitbar(0,' Please wait >>>>>>>>');
+    for ifc = 1:length(fvect)
+        fc = fvect(ifc);
+
+        % exciting
+        %     t = (1:length(yi))/(sRate);
+        Mod1 = m*yi.*cos(2*pi*fc*t);
+        winTukey = tukeywin(length(yi),r);
+        Mod2 = Mod1 + winTukey'.*cos(2*pi*fc*t);
+%         if numFreqs <=10
+%         else
+%             msgbox('Too many fc is employed','Error Message','error')
+%             break
+%         end
+        waveSendErrorBit = arbitraryTo33500_WaveformSend(Mod2,fgen,name);
+        if ~waveSendErrorBit % if exciting works
+            pause(0.01);
+        else % if exciting error
+            msgbox('Error occurred trying to sending waveform','Error Message','error')
+            break
+        end
+        %         %update waitbar
+        %         figure(hwait)
+        %         PerStr = fix(ii/numFreqs*1e4)/1e2;
+        %         str=['Send Waveforms Processing ',num2str(PerStr),'%'];
+        %         waitbar(ii/numFreqs,hwait,str);
+        %         pause(0.01);
+        %         ii = ii+1;
+        %     end
+        %     figure(hwait)
+        %     delete(hwait);
+        % end
+        % hwait = waitbar(0,' Please wait >>>>>>>>');
+        % ii = 1;
+        %
+        %        %update waitbar
+        figure(hwait)
+        PerStr = fix(ifc/numFreqs*1e4)/1e2;
+        str=['fc=' num2str(fc/1e3) '  Processing ',num2str(PerStr),'%'];
+        waitbar(ifc/numFreqs,hwait,str);
         pause(0.01);
+        % for fc = f_start:delta_f:f_end
+        %     name = [namepre num2str(ii)];
         exciteErrorBit = arbitraryTo33500_Burst(fgen,ampExcite,sRate_33500,name,burstPeriod);
         if ~exciteErrorBit % if exciting works
             pause(pausePeriod);
         else % if exciting error
             msgbox('Error occurred trying to exciting signal','Error Message','error')
-            return
+            break
         end
+        fprintf(fgen,'OUTPUT1 OFF'); %Enable Output for channel 1
+        %     pause(burstPeriod);
+
+        ifc = ifc+1;
         
-    else % if exciting error
-        msgbox('Error occurred trying to sending waveform','Error Message','error')
-        return
     end
+    %get rid of message box
+    figure(hwait)
+    delete(hwait);
 end
-
-
-
-%     fprintf(fgen,'OUTPUT1 OFF'); %Enable Output for channel 1
-%     pause(burstPeriod);
-
-
-%% Close instrument connection
-% fprintf(fgen,'OUTPUT1 OFF'); %Enable Output for channel 1
-fclose(fgen);
-toc
+    %% Close instrument connection
+    % fprintf(fgen,'OUTPUT1 OFF'); %Enable Output for channel 1
+    fclose(fgen);
+    toc
+    figure;
