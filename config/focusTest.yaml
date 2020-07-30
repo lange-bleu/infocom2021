@@ -15,8 +15,8 @@ model:
   fc2_dim: 601 # num_freq
 ---
 data:
-  train_dir: ''
-  test_dir: ''
+  train_dir: '/data/small/train'
+  test_dir: '/data/new_dataset_moreSNR/test/noise/leopard/-10dB'
   audio_len: 3.0
 ---
 form:
@@ -25,12 +25,14 @@ form:
   target:
     wav: '*-target.wav'
     mag: '*-target.pt'
+    phase: '*-ptarget.pt'
   mixed:
     wav: '*-mixed.wav'
     mag: '*-mixed.pt'
+    phase: '*-ptarget.pt'
 ---
 train:
-  batch_size: 8
+  batch_size: 6
   num_workers: 16
   optimizer: 'adam'
   adam: 0.001
@@ -39,6 +41,7 @@ train:
     final: 0.05
   summary_interval: 1
   checkpoint_interval: 1000
+  complex_loss_ratio: 0
 ---
 log:
   chkpt_dir: 'chkpt'

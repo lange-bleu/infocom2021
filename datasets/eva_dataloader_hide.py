@@ -46,10 +46,7 @@ def create_dataloader(hp, args, train):
 class VFDataset(Dataset):
     def __init__(self, hp, args, train):
         def find_all(file_format):
-            if args.new_dataset:
-                return sorted(glob.glob(os.path.join(self.data_dir, '**', file_format), recursive=True))
-            else:
-                return sorted(glob.glob(os.path.join(self.data_dir, file_format)))
+            return sorted(glob.glob(os.path.join(self.data_dir, file_format)))
         self.hp = hp
         self.args = args
         self.train = train
@@ -100,7 +97,10 @@ class VFDataset(Dataset):
             target_mag = torch.from_numpy(target_mag)
             mixed_mag = torch.from_numpy(mixed_mag)
             # mixed_phase = torch.from_numpy(mixed_phase)
-            return dvec_mel, target_wav, mixed_wav, new_target_wav, target_mag, new_target_mag, mixed_mag, mixed_phase
+            target_wav_path = self.target_wav_list[idx]
+            mixed_wav_path = self.mixed_wav_list[idx]
+            return dvec_mel, target_wav, mixed_wav, new_target_wav, target_mag, new_target_mag, mixed_mag, \
+                   mixed_phase, dvec_path, target_wav_path, mixed_wav_path
 
     def wav2magphase(self, path):
         wav, _ = librosa.load(path, self.hp.audio.sample_rate)

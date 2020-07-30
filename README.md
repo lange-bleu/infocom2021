@@ -15,6 +15,20 @@ Test: cd utils && python speech2text.py
 
 sdr,sir,sar = mir_eval.separation.bss_eval_sources(reference_sources, estimated_sources, compute_permutation=True)
 
+### Benchmark
+
+#### focus my voice:
+
+```bash
+python metric_eva_focus.py -c config/focusTest.yaml -e model/embedder.pt --checkpoint_path ../trained_model/enhance_my_voice/chkpt_201000.pt -o eva-focus -m focus -g 0 -x [noise]-[XdB].xlsx
+```
+
+#### hide my voice:
+
+```bash
+python metric_eva_hide.py -c config/hideTest.yaml -e model/embedder.pt --checkpoint_path ../trained_model/hide_my_voice/chkpt_304000.pt -o eva-hide -m hide -g 0 -x [noise]-[XdB].xlsx
+```
+
 ## Version Control
 
 | Version | Description |

@@ -8,6 +8,7 @@ from utils.audio import Audio
 from utils.hparams import HParam
 from model.model import VoiceFilter
 from model.embedder import SpeechEmbedder
+from utils.evaluation import tensor_normalize
 
 
 def main(args, hp):
@@ -23,26 +24,27 @@ def main(args, hp):
         embedder.eval()
 
         audio = Audio(hp)
-        dvec_wav, _ = librosa.load(args.reference_file, sr=16000)
-        dvec_mel = audio.get_mel(dvec_wav)
-        dvec_mel = torch.from_numpy(dvec_mel).float().cuda()
-        dvec = embedder(dvec_mel)
+        ref_wav, _ = librosa.load(args.reference_file, sr=16000)
+        ref_mel = audio.get_mel(ref_wav)
+        ref_mel = torch.from_numpy(ref_mel).float().cuda()
+        dvec = embedder(ref_mel)
         dvec = dvec.unsqueeze(0)
 
         mixed_wav, _ = librosa.load(args.mixed_file, sr=16000)
-        mag, phase = audio.wav2spec(mixed_wav)
-        mag = torch.from_numpy(mag).float().cuda()
+        mixed_mag, mixed_phase = audio.wav2spec(mixed_wav)
+        mixed_mag = torch.from_numpy(mixed_mag).float().cuda()
 
-        mag = mag.unsqueeze(0)
-        mask = model(mag, dvec)
-        est_mag = mag * mask
+        mixed_mag = mixed_mag.unsqueeze(0)
+        shadow_mag = model(mixed_mag, dvec)
 
-        est_mag = est_mag[0].cpu().detach().numpy()
-        est_wav = audio.spec2wav(est_mag, phase)
+        shadow_mag = shadow_mag[0].cpu().detach().numpy()
+        recorded_mag = tensor_normalize(mixed_mag + shadow_mag)
+        recorded_mag = recorded_mag[0].cpu().detach().numpy()
+        recorded_wav = audio.spec2wav(recorded_mag, mixed_mag)
 
         os.makedirs(args.out_dir, exist_ok=True)
         out_path = os.path.join(args.out_dir, 'result.wav')
-        librosa.output.write_wav(out_path, est_wav, sr=16000)
+        librosa.output.write_wav(out_path, recorded_wav, sr=16000)
 
 
 if __name__ == '__main__':

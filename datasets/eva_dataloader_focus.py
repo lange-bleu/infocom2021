@@ -1,3 +1,14 @@
+# This dataloader export path of the target wav and mixed wav,
+# used for evaluation with metric_eva.py
+
+import os
+import glob
+import torch
+import librosa
+from torch.utils.data import Dataset, DataLoader
+
+from utils.audio import Audio
+
 import os
 import glob
 import torch
@@ -12,24 +23,21 @@ def create_dataloader(hp, args, train):
         dvec_list = list()
         target_mag_list = list()
         mixed_mag_list = list()
-        new_target_mag_list = list()
 
-        for dvec_mel, target_mag, mixed_mag, new_target_mag in batch:
+        for dvec_mel, target_mag, mixed_mag in batch:
             dvec_list.append(dvec_mel)
             target_mag_list.append(target_mag)
             mixed_mag_list.append(mixed_mag)
-            new_target_mag_list.append(new_target_mag)
         target_mag_list = torch.stack(target_mag_list, dim=0)
         mixed_mag_list = torch.stack(mixed_mag_list, dim=0)
-        new_target_mag_list = torch.stack(new_target_mag_list, dim=0)
 
-        return dvec_list, target_mag_list, mixed_mag_list, new_target_mag_list
+        return dvec_list, target_mag_list, mixed_mag_list
 
     def test_collate_fn(batch):
         return batch
 
     if train:
-        return DataLoader(dataset=VFDataset(hp, args, True),
+        return DataLoader(dataset=EVADataset(hp, args, True),
                           batch_size=hp.train.batch_size,
                           shuffle=True,
                           num_workers=hp.train.num_workers,
@@ -38,18 +46,15 @@ def create_dataloader(hp, args, train):
                           drop_last=True,
                           sampler=None)
     else:
-        return DataLoader(dataset=VFDataset(hp, args, False),
+        return DataLoader(dataset=EVADataset(hp, args, False),
                           collate_fn=test_collate_fn,
                           batch_size=1, shuffle=True, num_workers=0)
 
 
-class VFDataset(Dataset):
+class EVADataset(Dataset):
     def __init__(self, hp, args, train):
         def find_all(file_format):
-            if args.new_dataset:
-                return sorted(glob.glob(os.path.join(self.data_dir, '**', file_format), recursive=True))
-            else:
-                return sorted(glob.glob(os.path.join(self.data_dir, file_format)))
+            return sorted(glob.glob(os.path.join(self.data_dir, file_format)))
         self.hp = hp
         self.args = args
         self.train = train
@@ -82,25 +87,18 @@ class VFDataset(Dataset):
         if self.train: # need to be fast
             target_mag = torch.load(self.target_mag_list[idx])
             mixed_mag = torch.load(self.mixed_mag_list[idx])
-            # add new target wav
-            target_wav, _ = librosa.load(self.target_wav_list[idx], self.hp.audio.sample_rate)
-            mixed_wav, _ = librosa.load(self.mixed_wav_list[idx], self.hp.audio.sample_rate)
-            new_target_wav = mixed_wav - target_wav
-            new_target_mag,_ = self.audio.wav2spec(new_target_wav)
-            new_target_mag = torch.from_numpy(new_target_mag)
-            return dvec_mel, target_mag, mixed_mag, new_target_mag
+            return dvec_mel, target_mag, mixed_mag
         else:
             target_wav, _ = librosa.load(self.target_wav_list[idx], self.hp.audio.sample_rate)
             mixed_wav, _ = librosa.load(self.mixed_wav_list[idx], self.hp.audio.sample_rate)
-            new_target_wav = mixed_wav - target_wav
-            new_target_mag,_ = self.audio.wav2spec(new_target_wav)
-            new_target_mag = torch.from_numpy(new_target_mag)
             target_mag, _ = self.wav2magphase(self.target_wav_list[idx])
             mixed_mag, mixed_phase = self.wav2magphase(self.mixed_wav_list[idx])
             target_mag = torch.from_numpy(target_mag)
             mixed_mag = torch.from_numpy(mixed_mag)
+            target_wav_path = self.target_wav_list[idx]
+            mixed_wav_path = self.mixed_wav_list[idx]
             # mixed_phase = torch.from_numpy(mixed_phase)
-            return dvec_mel, target_wav, mixed_wav, new_target_wav, target_mag, new_target_mag, mixed_mag, mixed_phase
+            return dvec_mel, target_wav, mixed_wav, target_mag, mixed_mag, mixed_phase, dvec_path, target_wav_path, mixed_wav_path
 
     def wav2magphase(self, path):
         wav, _ = librosa.load(path, self.hp.audio.sample_rate)
