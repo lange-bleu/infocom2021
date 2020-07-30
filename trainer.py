@@ -3,11 +3,11 @@ import time
 import logging
 import argparse
 
-from utils.train import train
+from utils.train import train_hide, train_focus
 from utils.hparams import HParam
 from utils.writer import MyWriter
-from datasets.dataloader import create_dataloader
-
+from datasets.eva_dataloader_focus import create_dataloader as create_focus_dataloader
+from datasets.eva_dataloader_hide import create_dataloader as create_hide_dataloader
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -25,6 +25,8 @@ if __name__ == '__main__':
                         help="Name of the loss function. Used for loss function selection.")
     parser.add_argument('-g', '--gpu', type=int, required=True, default='1',
                         help="ID of the selected gpu. Used for gpu selection.")
+    parser.add_argument('-h', '--hide', type=int, required=True, default='1',
+                        help="choose to train a hide or focus model, 1 for hide, 0 for focus")
     args = parser.parse_args()
 
     hp = HParam(args.config)
@@ -57,7 +59,11 @@ if __name__ == '__main__':
 
     writer = MyWriter(hp, log_dir)
 
-    trainloader = create_dataloader(hp, args, train=True)
-    testloader = create_dataloader(hp, args, train=False)
-
-    train(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp, hp_str)
+    if args.hide:
+        trainloader = create_hide_dataloader(hp, args, train=True)
+        testloader = create_hide_dataloader(hp, args, train=False)
+        train_hide(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp, hp_str)
+    else:
+        trainloader = create_focus_dataloader(hp, args, train=True)
+        testloader = create_focus_dataloader(hp, args, train=False)
+        train_focus(args, pt_dir, chkpt_path, trainloader, testloader, writer, logger, hp, hp_str)

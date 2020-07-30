@@ -29,6 +29,21 @@ python metric_eva_focus.py -c config/focusTest.yaml -e model/embedder.pt --check
 python metric_eva_hide.py -c config/hideTest.yaml -e model/embedder.pt --checkpoint_path ../trained_model/hide_my_voice/chkpt_304000.pt -o eva-hide -m hide -g 0 -x [noise]-[XdB].xlsx
 ```
 
+## Evaluate
+
+```bash
+python inference.py -c [config yaml] -e [path of embedder pt file] --checkpoint_path [path of chkpt pt file] -m [path of mixed wav file] -r [path of reference wav file] -g 1 -o [output directory]
+```
+
+Note that the checkpoint_path model will affect the model perform either hide or focus voice.
+
+
+### Train
+```bash
+python trainer.py -c [config yaml] -e [path of embedder pt file] -g 1 -l power/mse -m [name] -h 1/0
+```
+-h is selected to either train a hide voice model or a focus voice model
+
 ## Version Control
 
 | Version | Description |
