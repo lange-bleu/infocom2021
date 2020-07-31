@@ -62,10 +62,11 @@ def padsilencebefore(wav, samples):
     return np.hstack((np.zeros(samples), wav))
 
 
-def mix_conversation2(hp, args, audio, num, s1_dvec, s1_target, s2, train):
+def mix_conversation2(hp, args, audio, num, s1_dvec, s1_target, s2, spk, train):
     srate = hp.audio.sample_rate
+    speaker_id = spk[0].split('/')[3]
     dir_ = os.path.join(args.out_dir, 'train' if train else 'test')
-    sub_dir_ = os.path.join(dir_, 'conversation')
+    sub_dir_ = os.path.join(dir_, 'conversation', speaker_id)
     os.makedirs(sub_dir_, exist_ok=True)
 
     d, _ = librosa.load(s1_dvec, sr=srate)
@@ -135,11 +136,12 @@ def mix_conversation2(hp, args, audio, num, s1_dvec, s1_target, s2, train):
         f.write(s1_dvec)
 
 
-def mix_joint2(hp, args, audio, num, s1_dvec, s1_target, s2, SNR, train):
+def mix_joint2(hp, args, audio, num, s1_dvec, s1_target, s2, spk, SNR, train):
     # Add SNR option here
     srate = hp.audio.sample_rate
     dir_ = os.path.join(args.out_dir, 'train' if train else 'test')
-    sub_dir_ = os.path.join(dir_, 'joint', str(SNR)+'dB')
+    speaker_id = spk[0].split('/')[3]
+    sub_dir_ = os.path.join(dir_, 'joint', str(SNR)+'dB', speaker_id)
     os.makedirs(sub_dir_, exist_ok=True)
 
     d, _ = librosa.load(s1_dvec, sr=srate)
@@ -200,11 +202,12 @@ def mix_joint2(hp, args, audio, num, s1_dvec, s1_target, s2, SNR, train):
         f.write(s1_dvec)
 
 
-def mix_noise(hp, args, audio, num, s1_dvec, s1_target, noise_mat, noise_type, SNR, train):
+def mix_noise(hp, args, audio, num, s1_dvec, s1_target, noise_mat, noise_type, SNR, spk, train):
     srate = hp.audio.sample_rate
 
     dir_ = os.path.join(args.out_dir, 'train' if train else 'test')
-    sub_dir_ = os.path.join(dir_, 'noise', noise_type, str(SNR)+'dB')
+    speaker_id = spk[0].split('/')[3]
+    sub_dir_ = os.path.join(dir_, 'noise', noise_type, str(SNR)+'dB', speaker_id)
     os.makedirs(sub_dir_, exist_ok=True)
     d, _ = librosa.load(s1_dvec, sr=srate)
     w1, _ = librosa.load(s1_target, sr=srate)
@@ -298,7 +301,7 @@ if __name__ == '__main__':
         # + \
         # [x for x in glob.glob(os.path.join(args.libri_dir, 'train-other-500', '*'))
         #    if os.path.isdir(x)]
-        test_folders = [x for x in glob.glob(os.path.join(args.libri_dir, 'dev-clean', '*'))]
+        test_folders = [x for x in glob.glob(os.path.join(args.libri_dir, 'train-clean-360-40', '*'))]
 
     elif args.voxceleb_dir is not None:
         all_folders = [x for x in glob.glob(os.path.join(args.voxceleb_dir, '*'))
@@ -314,15 +317,6 @@ if __name__ == '__main__':
                 for spk in test_folders]
 
     test_spk = [x for x in test_spk if len(x) >= 2]  # list of list, each speaker has a list of wavs
-
-    selected_spk = ['84', '174', '422']
-    specific_spk = []
-    rest_spk = []
-    for spk in test_spk:
-        if spk[0].split('/')[-3] not in selected_spk:
-            rest_spk.append(spk)
-        else:
-            specific_spk.append(spk)
 
     audio = Audio(hp)
 
@@ -342,24 +336,29 @@ if __name__ == '__main__':
 
 
     def test_wrapper(num):
-        spk1 = random.sample(specific_spk, 1)[0]
-        spk2 = random.sample(rest_spk, 1)[0]
+        spk1 = specific_spk
+        spk2 = random.sample(rest_spks, 1)[0]
         # spk1, spk2 = random.sample(test_spk, 2)
-
         s1_dvec, s1_target = random.sample(spk1, 2)
         s2 = random.choice(spk2)
-        SNR = random.choice([-20, -10, 0, 10, 20])
-        mix_joint2(hp, args, audio, num, s1_dvec, s1_target, s2, SNR=SNR, train=False)
-        mix_conversation2(hp, args, audio, num, s1_dvec, s1_target, s2, train=False)
-        noise_source = glob.glob('./noise_source/*')
-        noise_mat = random.choice(noise_source)
-        noise_type = noise_mat.split('/')[-1][:-4]
-        mix_noise(hp, args, audio, num, s1_dvec, s1_target, noise_mat, noise_type, SNR, train=False)
+        # SNRs = [-10, -5, -2, 0, 2, 5, 10]
+        SNRs = [-5, 0, 5]
+        for SNR in SNRs:
+            mix_joint2(hp, args, audio, num, s1_dvec, s1_target, s2, spk1, SNR=SNR, train=False)
+        mix_conversation2(hp, args, audio, num, s1_dvec, s1_target, s2, spk1, train=False)
+        noise_sources = glob.glob('./noise_source/*')
+        for noise_mat in noise_sources:
+            noise_type = noise_mat.split('/')[-1][:-4]
+            for SNR in SNRs:
+                mix_noise(hp, args, audio, num, s1_dvec, s1_target, noise_mat, noise_type, SNR, spk1, train=False)
     # arr = list(range(10 ** 4))
     # with Pool(cpu_num) as p:
     #     r = list(tqdm.tqdm(p.imap(train_wrapper, arr), total=len(arr)))
 
     # arr = list(range(10 ** 2))
-    arr = list(range(10**2))
-    with Pool(cpu_num) as p:
-        r = list(tqdm.tqdm(p.imap(test_wrapper, arr), total=len(arr)))
+
+    for idx, specific_spk in enumerate(test_spk):
+        rest_spks = test_spk[idx+1:] + test_spk[:idx]
+        arr = list(range(50))
+        with Pool(cpu_num) as p:
+            r = list(tqdm.tqdm(p.imap(test_wrapper, arr), total=len(arr)))

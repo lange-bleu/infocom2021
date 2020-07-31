@@ -40,7 +40,7 @@ def create_dataloader(hp, args, train):
     else:
         return DataLoader(dataset=VFDataset(hp, args, False),
                           collate_fn=test_collate_fn,
-                          batch_size=1, shuffle=True, num_workers=0)
+                          batch_size=1, shuffle=False, num_workers=0)
 
 
 class VFDataset(Dataset):

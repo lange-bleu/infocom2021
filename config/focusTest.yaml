@@ -16,7 +16,7 @@ model:
 ---
 data:
   train_dir: '/data/small/train'
-  test_dir: '/data/new_dataset_moreSNR/test/noise/leopard/-10dB'
+  test_dir: '/data/new_dataset_test_40/test/'
   audio_len: 3.0
 ---
 form:

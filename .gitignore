@@ -10,6 +10,8 @@ logs/
 test/test_data/
 enhance_my_voice/
 hide_my_voice/
+eva-focus-40/
+eva-hide-40/
 *.asv
 # Byte-compiled / optimized / DLL files
 __pycache__/
