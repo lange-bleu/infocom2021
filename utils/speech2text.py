@@ -3,23 +3,29 @@ from os import path
 import jiwer
 from pesq import pesq
 from scipy.io import wavfile
+import librosa
+import mir_eval
 
-def metric_for_text(text_groundtruth,text_estimated):
+
+def metric_for_text(text_groundtruth, text_estimated):
     transformation = jiwer.Compose([
-    jiwer.ToLowerCase(),
-    jiwer.RemoveMultipleSpaces(),
-    jiwer.RemoveWhiteSpace(replace_by_space=False),
-    jiwer.SentencesToListOfWords(word_delimiter=" ")
-    ]) 
-    measures = jiwer.compute_measures(text_groundtruth, text_estimated,truth_transform=transformation,
-    hypothesis_transform=transformation)
+        jiwer.ToLowerCase(),
+        jiwer.RemoveMultipleSpaces(),
+        jiwer.RemoveWhiteSpace(replace_by_space=False),
+        jiwer.SentencesToListOfWords(word_delimiter=" ")
+    ])
+    measures = jiwer.compute_measures(text_groundtruth, text_estimated, truth_transform=transformation,
+                                      hypothesis_transform=transformation)
+    measures = jiwer.compute_measures(text_groundtruth, text_estimated)
     wer = measures['wer']
     mer = measures['mer']
     wil = measures['wil']
-    return [wer,mer,wil]
 
-def speech_2_text(wav_groundtruth=path.join(path.dirname(path.realpath(__file__)), "speakerA.wav"),wav_estimated=path.join(path.dirname(path.realpath(__file__)), "speakerB.wav"), engine_name='google'):
+    return [wer, mer, wil]
 
+
+def speech_2_text(wav_groundtruth=path.join(path.dirname(path.realpath(__file__)), "speakerA.wav"),
+                  wav_estimated=path.join(path.dirname(path.realpath(__file__)), "speakerB.wav"), engine_name='google'):
     r = sr.Recognizer()
     with sr.AudioFile(wav_groundtruth) as source:
         audio = r.record(source)
@@ -30,17 +36,21 @@ def speech_2_text(wav_groundtruth=path.join(path.dirname(path.realpath(__file__)
     rate, audio_pesq = wavfile.read(wav_groundtruth)
     rate, audio_estimated_pesq = wavfile.read(wav_estimated)
 
+    (sdr, sir, sar, _) = mir_eval.separation.bss_eval_sources(audio_pesq, audio_estimated_pesq, compute_permutation=True)
+
     if engine_name == 'google':
-        GOOGLE_CLOUD_SPEECH_CREDENTIALS_PATH = path.join(path.dirname(path.realpath(__file__)), "key.json")
-        with open (GOOGLE_CLOUD_SPEECH_CREDENTIALS_PATH, 'r') as file:
-            GOOGLE_CLOUD_SPEECH_CREDENTIALS = file.read ()
+        GOOGLE_CLOUD_SPEECH_CREDENTIALS_PATH = path.join(path.dirname(path.realpath(__file__)), "mykey.json")
+        with open(GOOGLE_CLOUD_SPEECH_CREDENTIALS_PATH, 'r') as file:
+            GOOGLE_CLOUD_SPEECH_CREDENTIALS = file.read()
         try:
-            text_groundtruth=r.recognize_google_cloud (audio, language = "en-us", credentials_json = GOOGLE_CLOUD_SPEECH_CREDENTIALS)
-            text_estimated=r.recognize_google_cloud (audio_estimated, language = "en-us", credentials_json = GOOGLE_CLOUD_SPEECH_CREDENTIALS)
-            print ("Groundtruth:{0}; Estimated:{1}" .format(text_groundtruth,text_estimated))
+            text_groundtruth = r.recognize_google_cloud(audio, language="en-us",
+                                                        credentials_json=GOOGLE_CLOUD_SPEECH_CREDENTIALS)
+            text_estimated = r.recognize_google_cloud(audio_estimated, language="en-us",
+                                                      credentials_json=GOOGLE_CLOUD_SPEECH_CREDENTIALS)
+            print("Groundtruth:{0}; Estimated:{1}".format(text_groundtruth, text_estimated))
             print(pesq(rate, audio_pesq, audio_estimated_pesq, 'wb'))
             # return the results
-            return metric_for_text(text_groundtruth,text_estimated), pesq(rate, audio_pesq, audio_estimated_pesq, 'wb')
+            return metric_for_text(text_groundtruth, text_estimated), pesq(rate, audio_pesq, audio_estimated_pesq, 'wb'), sdr, sir, sar
 
         except sr.UnknownValueError:
             print("Google Cloud Speech could not understand audio")
@@ -97,7 +107,8 @@ def speech_2_text(wav_groundtruth=path.join(path.dirname(path.realpath(__file__)
         HOUNDIFY_CLIENT_ID = "INSERT HOUNDIFY CLIENT ID HERE"  # Houndify client IDs are Base64-encoded strings
         HOUNDIFY_CLIENT_KEY = "INSERT HOUNDIFY CLIENT KEY HERE"  # Houndify client keys are Base64-encoded strings
         try:
-            print("Houndify thinks you said " + r.recognize_houndify(audio, client_id=HOUNDIFY_CLIENT_ID, client_key=HOUNDIFY_CLIENT_KEY))
+            print("Houndify thinks you said " + r.recognize_houndify(audio, client_id=HOUNDIFY_CLIENT_ID,
+                                                                     client_key=HOUNDIFY_CLIENT_KEY))
         except sr.UnknownValueError:
             print("Houndify could not understand audio")
         except sr.RequestError as e:
@@ -107,19 +118,25 @@ def speech_2_text(wav_groundtruth=path.join(path.dirname(path.realpath(__file__)
         IBM_USERNAME = "INSERT IBM SPEECH TO TEXT USERNAME HERE"  # IBM Speech to Text usernames are strings of the form XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
         IBM_PASSWORD = "INSERT IBM SPEECH TO TEXT PASSWORD HERE"  # IBM Speech to Text passwords are mixed-case alphanumeric strings
         try:
-            print("IBM Speech to Text thinks you said " + r.recognize_ibm(audio, username=IBM_USERNAME, password=IBM_PASSWORD))
+            print("IBM Speech to Text thinks you said " + r.recognize_ibm(audio, username=IBM_USERNAME,
+                                                                          password=IBM_PASSWORD))
         except sr.UnknownValueError:
             print("IBM Speech to Text could not understand audio")
         except sr.RequestError as e:
             print("Could not request results from IBM Speech to Text service; {0}".format(e))
 
 if __name__ == '__main__':
-    wav_groundtruth = path.join(path.dirname(path.realpath(__file__)), "speakerA.wav")
-    wav_estimated = path.join(path.dirname(path.realpath(__file__)), "speakerB.wav")
+
+    wav_groundtruth = path.join(path.dirname(path.realpath(__file__)), "000030-target.wav")
+    wav_estimated = path.join(path.dirname(path.realpath(__file__)), "000030-target.wav")
     # wav_groundtruth = path.join(path.dirname(path.realpath(__file__)), "french.aiff")
     # wav_groundtruth = path.join(path.dirname(path.realpath(__file__)), "chinese.flac")
-
+    # sr, wav = wavfile.read(wav_groundtruth)
+    # wav2, _ = librosa.load(wav_groundtruth, sr=16000)
+    # print(wav)
+    # print(wav2)
+    # print(wav2*255)
     # use the audio file as the audio source
-    engine_name='google'
-    [wer,mer,wil],pesq_value=speech_2_text(wav_groundtruth,wav_estimated,engine_name)
-    print("wer: {0}, mer: {1}, wil: {2}, pesq: {3}".format(wer,mer,wil,pesq_value))
+    engine_name = 'google'
+    [wer, mer, wil], pesq_value = speech_2_text(wav_groundtruth, wav_estimated, engine_name)
+    print("wer: {0}, mer: {1}, wil: {2}, pesq: {3}".format(wer, mer, wil, pesq_value))
