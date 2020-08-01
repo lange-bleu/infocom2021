@@ -54,7 +54,7 @@ sRate = aFs*Fs;
 % parameters of 33500 waveform generator
 Address_33500 = '10';
 sRate_33500 = sRate;
-ampExcite = 8.5; % Vpp
+ampExcite = 9; % Vpp
 % f_end = 25.3e3; % sweep frequency Hz
 % delta_f = 1e2;
 % f_start = 24.7e3;
