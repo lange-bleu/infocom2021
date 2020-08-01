@@ -70,7 +70,8 @@ if __name__ == '__main__':
     hp = HParam(args.config)
     root_dir_test = hp.data.test_dir
     alldirs = [x[0] for x in os.walk(root_dir_test)]
-    dirs = [leaf for leaf in alldirs if leaf.split('/')[-1].isnumeric()]
+    # dirs = [leaf for leaf in alldirs if leaf.split('/')[-1].isnumeric()]
+    dirs = [leaf for leaf in alldirs if leaf.split('/')[-1] == 'conversation' or leaf.split('/')[-1]== '0dB']
 
     for dir in dirs:
         hp.data.test_dir = dir

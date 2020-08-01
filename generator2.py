@@ -66,7 +66,7 @@ def mix_conversation2(hp, args, audio, num, s1_dvec, s1_target, s2, spk, train):
     srate = hp.audio.sample_rate
     speaker_id = spk[0].split('/')[3]
     dir_ = os.path.join(args.out_dir, 'train' if train else 'test')
-    sub_dir_ = os.path.join(dir_, 'conversation', speaker_id)
+    sub_dir_ = os.path.join(dir_, speaker_id, 'conversation')
     os.makedirs(sub_dir_, exist_ok=True)
 
     d, _ = librosa.load(s1_dvec, sr=srate)
@@ -141,7 +141,7 @@ def mix_joint2(hp, args, audio, num, s1_dvec, s1_target, s2, spk, SNR, train):
     srate = hp.audio.sample_rate
     dir_ = os.path.join(args.out_dir, 'train' if train else 'test')
     speaker_id = spk[0].split('/')[3]
-    sub_dir_ = os.path.join(dir_, 'joint', str(SNR)+'dB', speaker_id)
+    sub_dir_ = os.path.join(dir_, speaker_id, 'joint', str(SNR)+'dB')
     os.makedirs(sub_dir_, exist_ok=True)
 
     d, _ = librosa.load(s1_dvec, sr=srate)
@@ -207,7 +207,7 @@ def mix_noise(hp, args, audio, num, s1_dvec, s1_target, noise_mat, noise_type, S
 
     dir_ = os.path.join(args.out_dir, 'train' if train else 'test')
     speaker_id = spk[0].split('/')[3]
-    sub_dir_ = os.path.join(dir_, 'noise', noise_type, str(SNR)+'dB', speaker_id)
+    sub_dir_ = os.path.join(dir_, speaker_id, 'noise', noise_type, str(SNR)+'dB')
     os.makedirs(sub_dir_, exist_ok=True)
     d, _ = librosa.load(s1_dvec, sr=srate)
     w1, _ = librosa.load(s1_target, sr=srate)
@@ -342,7 +342,8 @@ if __name__ == '__main__':
         s1_dvec, s1_target = random.sample(spk1, 2)
         s2 = random.choice(spk2)
         # SNRs = [-10, -5, -2, 0, 2, 5, 10]
-        SNRs = [-5, 0, 5]
+        # SNRs = [-5, 0, 5]
+        SNRs = [0]
         for SNR in SNRs:
             mix_joint2(hp, args, audio, num, s1_dvec, s1_target, s2, spk1, SNR=SNR, train=False)
         mix_conversation2(hp, args, audio, num, s1_dvec, s1_target, s2, spk1, train=False)
