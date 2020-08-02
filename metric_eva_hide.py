@@ -73,8 +73,11 @@ if __name__ == '__main__':
     alldirs = [x[0] for x in os.walk(root_dir_test)]
     # dirs = [leaf for leaf in alldirs if leaf.split('/')[-1].isnumeric()]
     dirs = [leaf for leaf in alldirs if leaf.split('/')[-1] == 'conversation' or leaf.split('/')[-1]== '0dB']
+    speaker_count = 0
 
     for dir in dirs:
+        speaker_count = speaker_count + 1
+        print("Speaker : {}/40\n".format(speaker_count))
         hp.data.test_dir = dir
         testloader = create_dataloader(hp, args, train=False)
         result_purified1 = []
@@ -91,8 +94,8 @@ if __name__ == '__main__':
             # length of batch is 1, set in dataloader
             ref_mel, eliminated_wav, mixed_wav, expected_hidden_wav, eliminated_mag, expected_hidden_mag, mixed_mag, mixed_phase, dvec_path, eliminated_wav_path, mixed_wav_path = \
                 batch[0]
-            print("eliminated: {}".format(eliminated_wav_path))
-            print("Mixed: {}".format(mixed_wav_path))
+            # print("eliminated: {}".format(eliminated_wav_path))
+            # print("Mixed: {}".format(mixed_wav_path))
             model = VoiceFilter(hp).cuda()
             chkpt_model = torch.load(args.checkpoint_path, map_location='cuda:0')['model']
             model.load_state_dict(chkpt_model)
@@ -169,24 +172,24 @@ if __name__ == '__main__':
                   "confidence": purified1_conf}
             result_purified1.append(r1)
 
-            try:
-                [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(eliminated_path, purified2, 'google')
-            except TypeError:
-                wer, mer, wil, pesq_value, sdr, sir, sar = init_badwav()
-
-            r2 = {"mixed_path": mixed_wav_path, "eliminated_path": eliminated_wav_path,
-                  "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
-                  "confidence": purified2_conf}
-            result_purified2.append(r2)
-
-            try:
-                [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(eliminated_path, purified3, 'google')
-            except TypeError:
-                wer, mer, wil, pesq_value, sdr, sir, sar = init_badwav()
-            r3 = {"mixed_path": mixed_wav_path, "eliminated_path": eliminated_wav_path,
-                  "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
-                  "confidence": purified3_conf}
-            result_purified3.append(r3)
+            # try:
+            #     [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(eliminated_path, purified2, 'google')
+            # except TypeError:
+            #     wer, mer, wil, pesq_value, sdr, sir, sar = init_badwav()
+            #
+            # r2 = {"mixed_path": mixed_wav_path, "eliminated_path": eliminated_wav_path,
+            #       "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
+            #       "confidence": purified2_conf}
+            # result_purified2.append(r2)
+            #
+            # try:
+            #     [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(eliminated_path, purified3, 'google')
+            # except TypeError:
+            #     wer, mer, wil, pesq_value, sdr, sir, sar = init_badwav()
+            # r3 = {"mixed_path": mixed_wav_path, "eliminated_path": eliminated_wav_path,
+            #       "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
+            #       "confidence": purified3_conf}
+            # result_purified3.append(r3)
 
             try:
                 [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(eliminated_path, mixed_path, 'google')
@@ -198,66 +201,68 @@ if __name__ == '__main__':
             result_mixed.append(r4)
 
             # Measurement for new eliminated
+            if dir.split('/')[-3] != 'noise':
+                try:
+                    [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(expected_hidden_path, purified1, 'google')
+                except TypeError:
+                    wer, mer, wil, pesq_value, sdr, sir, sar = init_badwav()
+                    # print(
+                    #     "Spectrogram: wer: {0}, mer: {1}, wil: {2}, pesq: {3}, sdr: {4}".format(wer, mer, wil, pesq_value, sdr))
+                r1 = {"mixed_path": mixed_wav_path, "eliminated_path": eliminated_wav_path,
+                      "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
+                      "confidence": purified1_conf}
+                result_purified1_new.append(r1)
 
-            try:
-                [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(expected_hidden_path, purified1, 'google')
-            except TypeError:
-                wer, mer, wil, pesq_value, sdr, sir, sar = init_badwav()
-                # print(
-                #     "Spectrogram: wer: {0}, mer: {1}, wil: {2}, pesq: {3}, sdr: {4}".format(wer, mer, wil, pesq_value, sdr))
-            r1 = {"mixed_path": mixed_wav_path, "eliminated_path": eliminated_wav_path,
-                  "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
-                  "confidence": purified1_conf}
-            result_purified1_new.append(r1)
+            # try:
+            #     [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(expected_hidden_path, purified2, 'google')
+            # except TypeError:
+            #     wer, mer, wil, pesq_value, sdr, sir, sar = init_badwav()
+            #
+            # r2 = {"mixed_path": mixed_wav_path, "eliminated_path": eliminated_wav_path,
+            #       "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
+            #       "confidence": purified2_conf}
+            # result_purified2_new.append(r2)
+            #
+            # try:
+            #     [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(expected_hidden_path, purified3, 'google')
+            # except TypeError:
+            #     wer, mer, wil, pesq_value, sdr, sir, sar = init_badwav()
+            # r3 = {"mixed_path": mixed_wav_path, "eliminated_path": eliminated_wav_path,
+            #       "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
+            #       "confidence": purified3_conf}
+            # result_purified3_new.append(r3)
 
-            try:
-                [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(expected_hidden_path, purified2, 'google')
-            except TypeError:
-                wer, mer, wil, pesq_value, sdr, sir, sar = init_badwav()
-
-            r2 = {"mixed_path": mixed_wav_path, "eliminated_path": eliminated_wav_path,
-                  "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
-                  "confidence": purified2_conf}
-            result_purified2_new.append(r2)
-
-            try:
-                [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(expected_hidden_path, purified3, 'google')
-            except TypeError:
-                wer, mer, wil, pesq_value, sdr, sir, sar = init_badwav()
-            r3 = {"mixed_path": mixed_wav_path, "eliminated_path": eliminated_wav_path,
-                  "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
-                  "confidence": purified3_conf}
-            result_purified3_new.append(r3)
-
-            try:
-                [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(expected_hidden_path, mixed_path, 'google')
-            except TypeError:
-                wer, mer, wil, pesq_value, sdr, sir, sar = init_badwav()
-            r4 = {"mixed_path": mixed_wav_path, "eliminated_path": eliminated_wav_path,
-                  "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
-                  "confidence": mixed_conf}
-            result_mixed_new.append(r4)
+                try:
+                    [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(expected_hidden_path, mixed_path, 'google')
+                except TypeError:
+                    wer, mer, wil, pesq_value, sdr, sir, sar = init_badwav()
+                r4 = {"mixed_path": mixed_wav_path, "eliminated_path": eliminated_wav_path,
+                      "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
+                      "confidence": mixed_conf}
+                result_mixed_new.append(r4)
+            else:
+                print("Expect hidden is a constant noise, skip it! ")
 
         hide_result_eliminated = os.path.join(dir, 'hide_eliminated.xlsx')
         writer = pd.ExcelWriter(hide_result_eliminated, engine='xlsxwriter', options={'strings_to_urls': False})
         df1 = pd.DataFrame(data=result_purified1)
-        df2 = pd.DataFrame(data=result_purified2)
-        df3 = pd.DataFrame(data=result_purified3)
+        # df2 = pd.DataFrame(data=result_purified2)
+        # df3 = pd.DataFrame(data=result_purified3)
         df4 = pd.DataFrame(data=result_mixed)
         df1.to_excel(writer, sheet_name='purified1')
-        df2.to_excel(writer, sheet_name='purified2')
-        df3.to_excel(writer, sheet_name='purified3')
+        # df2.to_excel(writer, sheet_name='purified2')
+        # df3.to_excel(writer, sheet_name='purified3')
         df4.to_excel(writer, sheet_name='mixed')
 
         hide_result_expect_hidden = os.path.join(dir, 'hide_expect_hidden.xlsx')
         writer1 = pd.ExcelWriter(hide_result_expect_hidden, engine='xlsxwriter', options={'strings_to_urls': False})
         df1 = pd.DataFrame(data=result_purified1_new)
-        df2 = pd.DataFrame(data=result_purified2_new)
-        df3 = pd.DataFrame(data=result_purified3_new)
+        # df2 = pd.DataFrame(data=result_purified2_new)
+        # df3 = pd.DataFrame(data=result_purified3_new)
         df4 = pd.DataFrame(data=result_mixed_new)
         df1.to_excel(writer1, sheet_name='purified1')
-        df2.to_excel(writer1, sheet_name='purified2')
-        df3.to_excel(writer1, sheet_name='purified3')
+        # df2.to_excel(writer1, sheet_name='purified2')
+        # df3.to_excel(writer1, sheet_name='purified3')
         df4.to_excel(writer1, sheet_name='mixed')
         writer.close()
         writer1.close()

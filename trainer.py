@@ -25,7 +25,7 @@ if __name__ == '__main__':
                         help="Name of the loss function. Used for loss function selection.")
     parser.add_argument('-g', '--gpu', type=int, required=True, default='1',
                         help="ID of the selected gpu. Used for gpu selection.")
-    parser.add_argument('-h', '--hide', type=int, required=True, default='1',
+    parser.add_argument('-k', '--hide', type=int, required=True, default='1',
                         help="choose to train a hide or focus model, 1 for hide, 0 for focus")
     args = parser.parse_args()
 

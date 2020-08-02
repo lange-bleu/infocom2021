@@ -61,8 +61,9 @@ def validate_focus(audio, model, embedder, testloader, writer, step):
     criterion = nn.MSELoss()
     with torch.no_grad():
         for batch in testloader:
-            dvec_mel, expected_focused_wav, mixed_wav, expected_focused_mag, mixed_mag, mixed_phase = batch[0]
-
+            # ref_mel, expected_focused_wav, mixed_wav, expected_focused_mag, mixed_mag, mixed_phase, dvec_path, expected_focused_wav_path, mixed_wav_path
+            dvec_mel, expected_focused_wav, mixed_wav, expected_focused_mag, mixed_mag, mixed_phase, _, _, _ = batch[0]
+            print(batch[0][-1])
             dvec_mel = dvec_mel.cuda()
             expected_focused_mag = expected_focused_mag.unsqueeze(0).cuda()
             mixed_mag = mixed_mag.unsqueeze(0).cuda()

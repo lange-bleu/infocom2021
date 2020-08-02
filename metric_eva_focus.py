@@ -73,7 +73,10 @@ if __name__ == '__main__':
     # dirs = [leaf for leaf in alldirs if leaf.split('/')[-1].isnumeric()]
     dirs = [leaf for leaf in alldirs if leaf.split('/')[-1] == 'conversation' or leaf.split('/')[-1]== '0dB']
 
+    speaker_count = 0
     for dir in dirs:
+        speaker_count = speaker_count + 1
+        print("Speaker : {}/40\n".format(speaker_count))
         hp.data.test_dir = dir
         testloader = create_dataloader(hp, args, train=False)
         result_focused1 = []
@@ -84,8 +87,8 @@ if __name__ == '__main__':
             # length of batch is 1, set in dataloader
             ref_mel, expected_focused_wav, mixed_wav, expected_focused_mag, mixed_mag, mixed_phase, dvec_path, expected_focused_wav_path, mixed_wav_path = \
                 batch[0]
-            print("expected_focused: {}".format(expected_focused_wav_path))
-            print("Mixed: {}".format(mixed_wav_path))
+            # print("expected_focused: {}".format(expected_focused_wav_path))
+            # print("Mixed: {}".format(mixed_wav_path))
             model = VoiceFilter(hp).cuda()
             chkpt_model = torch.load(args.checkpoint_path)['model']
             model.load_state_dict(chkpt_model)
@@ -159,24 +162,24 @@ if __name__ == '__main__':
                   "confidence": purified1_conf}
             result_focused1.append(r1)
 
-            try:
-                [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(expected_focused_path, purified2, 'google')
-            except TypeError:
-                wer, mer, wil, pesq_value, sdr, sir, sar = init_badwav()
-
-            r2 = {"mixed_path": mixed_wav_path, "expected_focused_path": expected_focused_wav_path,
-                  "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
-                  "confidence": purified2_conf}
-            result_focused2.append(r2)
-
-            try:
-                [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(expected_focused_path, purified3, 'google')
-            except TypeError:
-                wer, mer, wil, pesq_value, sdr, sir, sar = init_badwav()
-            r3 = {"mixed_path": mixed_wav_path, "expected_focused_path": expected_focused_wav_path,
-                  "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
-                  "confidence": purified3_conf}
-            result_focused3.append(r3)
+            # try:
+            #     [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(expected_focused_path, purified2, 'google')
+            # except TypeError:
+            #     wer, mer, wil, pesq_value, sdr, sir, sar = init_badwav()
+            #
+            # r2 = {"mixed_path": mixed_wav_path, "expected_focused_path": expected_focused_wav_path,
+            #       "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
+            #       "confidence": purified2_conf}
+            # result_focused2.append(r2)
+            #
+            # try:
+            #     [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(expected_focused_path, purified3, 'google')
+            # except TypeError:
+            #     wer, mer, wil, pesq_value, sdr, sir, sar = init_badwav()
+            # r3 = {"mixed_path": mixed_wav_path, "expected_focused_path": expected_focused_wav_path,
+            #       "wer": wer, "mer": mer, "wil": wil, "pesq": pesq_value, "sdr": sdr[0], "sir": sir[0], "sar": sar[0],
+            #       "confidence": purified3_conf}
+            # result_focused3.append(r3)
 
             try:
                 [wer, mer, wil], pesq_value, sdr, sir, sar = speech_2_text(expected_focused_path, mixed_path, 'google')
@@ -191,11 +194,11 @@ if __name__ == '__main__':
 
         writer = pd.ExcelWriter(focus_result_expect_focused, engine='xlsxwriter', options={'strings_to_urls': False})
         df1 = pd.DataFrame(data=result_focused1)
-        df2 = pd.DataFrame(data=result_focused2)
-        df3 = pd.DataFrame(data=result_focused3)
+        # df2 = pd.DataFrame(data=result_focused2)
+        # df3 = pd.DataFrame(data=result_focused3)
         df4 = pd.DataFrame(data=result_mixed)
         df1.to_excel(writer, sheet_name='purified1')
-        df2.to_excel(writer, sheet_name='purified2')
-        df3.to_excel(writer, sheet_name='purified3')
+        # df2.to_excel(writer, sheet_name='purified2')
+        # df3.to_excel(writer, sheet_name='purified3')
         df4.to_excel(writer, sheet_name='mixed')
         writer.close()

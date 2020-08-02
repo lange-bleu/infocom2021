@@ -8,14 +8,14 @@ import mir_eval
 
 
 def metric_for_text(text_groundtruth, text_estimated):
-    transformation = jiwer.Compose([
-        jiwer.ToLowerCase(),
-        jiwer.RemoveMultipleSpaces(),
-        jiwer.RemoveWhiteSpace(replace_by_space=False),
-        jiwer.SentencesToListOfWords(word_delimiter=" ")
-    ])
-    measures = jiwer.compute_measures(text_groundtruth, text_estimated, truth_transform=transformation,
-                                      hypothesis_transform=transformation)
+    # transformation = jiwer.Compose([
+    #     jiwer.ToLowerCase(),
+    #     jiwer.RemoveMultipleSpaces(),
+    #     jiwer.RemoveWhiteSpace(replace_by_space=False),
+    #     jiwer.SentencesToListOfWords(word_delimiter=" ")
+    # ])
+    # measures = jiwer.compute_measures(text_groundtruth, text_estimated, truth_transform=transformation,
+    #                                   hypothesis_transform=transformation)
     measures = jiwer.compute_measures(text_groundtruth, text_estimated)
     wer = measures['wer']
     mer = measures['mer']
@@ -39,7 +39,7 @@ def speech_2_text(wav_groundtruth=path.join(path.dirname(path.realpath(__file__)
     (sdr, sir, sar, _) = mir_eval.separation.bss_eval_sources(audio_pesq, audio_estimated_pesq, compute_permutation=True)
 
     if engine_name == 'google':
-        GOOGLE_CLOUD_SPEECH_CREDENTIALS_PATH = path.join(path.dirname(path.realpath(__file__)), "mykey.json")
+        GOOGLE_CLOUD_SPEECH_CREDENTIALS_PATH = path.join(path.dirname(path.realpath(__file__)), "mykey2.json")
         with open(GOOGLE_CLOUD_SPEECH_CREDENTIALS_PATH, 'r') as file:
             GOOGLE_CLOUD_SPEECH_CREDENTIALS = file.read()
         try:
@@ -47,8 +47,8 @@ def speech_2_text(wav_groundtruth=path.join(path.dirname(path.realpath(__file__)
                                                         credentials_json=GOOGLE_CLOUD_SPEECH_CREDENTIALS)
             text_estimated = r.recognize_google_cloud(audio_estimated, language="en-us",
                                                       credentials_json=GOOGLE_CLOUD_SPEECH_CREDENTIALS)
-            print("Groundtruth:{0}; Estimated:{1}".format(text_groundtruth, text_estimated))
-            print(pesq(rate, audio_pesq, audio_estimated_pesq, 'wb'))
+            # print("Groundtruth:{0}; Estimated:{1}".format(text_groundtruth, text_estimated))
+            # print(pesq(rate, audio_pesq, audio_estimated_pesq, 'wb'))
             # return the results
             return metric_for_text(text_groundtruth, text_estimated), pesq(rate, audio_pesq, audio_estimated_pesq, 'wb'), sdr, sir, sar
 

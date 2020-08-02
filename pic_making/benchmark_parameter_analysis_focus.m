@@ -21,7 +21,7 @@ set(fig,'defaultAxesColorOrder',[left_color; right_color]);
 
 set(fig,'PaperSize',[7.5 3.8]);
 
-data_root = '/data/test_40/test';
+data_root = '/data/train_40/test';
 
 %% differnt noise
 data_type=["conversation", "joint","babble","factory2","leopard", "volvo"];
@@ -29,7 +29,7 @@ metric = ["WER", "pesq", "SDR", "Confidence"];
 error_matrix_total=cell(data_type.size(2),4);
 speakers = dir(data_root);
 speaker_ids = {speakers(3:end).name};
-speaker_ids = {1919, 777};
+speaker_ids = {14};
 for speaker_id = speaker_ids
     mkdir(num2str(speaker_id{1,1}));
     for ii=1:data_type.size(2)
@@ -48,10 +48,10 @@ for speaker_id = speaker_ids
         end
     end
     raw_data=cell(6,2);
-    for jj=1:4
+    for jj=1:4   % set to 1:4 for previous focus xlsx
         for ii=1:data_type.size(2)
             index=1;
-            for kk=[1,4]
+            for kk=[1,2]  % set to [1,2] for previous focus xlsx
                 data_per_noise=error_matrix_total{ii,kk};
                 raw_data{ii,index}=data_per_noise(:,jj);
                 index=index+1;

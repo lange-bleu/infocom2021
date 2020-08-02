@@ -55,6 +55,7 @@ class EVADataset(Dataset):
     def __init__(self, hp, args, train):
         def find_all(file_format):
             return sorted(glob.glob(os.path.join(self.data_dir, file_format)))
+            # return sorted(glob.glob(os.path.join(self.data_dir, '**', file_format), recursive=True))
         self.hp = hp
         self.args = args
         self.train = train
