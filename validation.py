@@ -80,7 +80,7 @@ if __name__ == '__main__':
 
     audio = Audio(hp)
     model = VoiceFilter(hp).cuda()
-    checkpoint = torch.load(chkpt_path)
+    checkpoint = torch.load(chkpt_path, map_location='cuda:0')
     model.load_state_dict(checkpoint['model'])
     step = 1
     if args.hide:

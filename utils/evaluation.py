@@ -21,7 +21,7 @@ def validate_hide(audio, model, embedder, testloader, writer, step):
     criterion = nn.MSELoss()
     with torch.no_grad():
         for batch in testloader:
-            dvec_mel, eliminated_wav, mixed_wav, expected_hidden_wav, eliminated_mag, expected_hidden_mag, mixed_mag, mixed_phase = batch[0]
+            dvec_mel, eliminated_wav, mixed_wav, expected_hidden_wav, eliminated_mag, expected_hidden_mag, mixed_mag, mixed_phase, _, _, _ = batch[0]
 
             dvec_mel = dvec_mel.cuda()
             eliminated_mag = eliminated_mag.unsqueeze(0).cuda()
@@ -44,7 +44,7 @@ def validate_hide(audio, model, embedder, testloader, writer, step):
             # scale is frequency pass to time domain, used on wav signal normalization
             recorded_wav1 = audio.spec2wav(recorded_mag, mixed_phase)  # path 1
             recorded_wav2 = (mixed_wav + 50*shadow_wav) / max(abs(mixed_wav + 50*shadow_wav))  # path 2
-            recorded_wav3 = mixed_wav + shadow_wav  # path 3
+            recorded_wav3 = (mixed_wav + shadow_wav) / max(abs(mixed_wav + shadow_wav))  # path 3
             sdr = bss_eval_sources(expected_hidden_wav, recorded_wav1, False)[0][0]
             # do normalize wav or not?
             writer.log_evaluation_hide(test_loss, sdr,
