@@ -29,7 +29,7 @@ metric = ["WER", "pesq", "SDR", "Confidence"];
 error_matrix_total=cell(data_type.size(2),4);
 speakers = dir(data_root);
 speaker_ids = {speakers(3:end).name};
-speaker_ids = {1919, 777};
+speaker_ids = {3536};
 for speaker_id = speaker_ids
     mkdir(num2str(speaker_id{1,1}));
     for ii=1:data_type.size(2)

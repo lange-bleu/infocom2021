@@ -16,7 +16,7 @@ model:
 ---
 data:
   train_dir: '/data/small/train'
-  test_dir: '/data/test_40/test/'
+  test_dir: '/data/train_40/'
   audio_len: 3.0
 ---
 form:
@@ -40,7 +40,7 @@ train:
     initial: 0.001
     final: 0.05
   summary_interval: 1
-  checkpoint_interval: 1000
+  checkpoint_interval: 2
   complex_loss_ratio: 0
 ---
 log:
