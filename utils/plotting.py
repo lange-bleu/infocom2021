@@ -11,11 +11,11 @@ def fig2np(fig):
 
 def plot_spectrogram_to_numpy(spectrogram):
     fig, ax = plt.subplots(figsize=(5, 3))
-    im = ax.imshow(spectrogram, aspect='auto', origin='lower',
+    im = ax.imshow(spectrogram, aspect='auto', origin='lower',  extent=[0,3,0,8000],
                    interpolation='none', vmin=0, vmax=1)
     plt.colorbar(im, ax=ax)
-    plt.xlabel('Frames')
-    plt.ylabel('Channels')
+    plt.xlabel('Seconds')
+    plt.ylabel('Frequency (Hz)')
     plt.tight_layout()
 
     fig.canvas.draw()
