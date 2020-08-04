@@ -75,20 +75,22 @@ if __name__ == '__main__':
     speaker_count = 0
     six_Results = {}  # { noise1: [{conf1:x, conf2:x, conf3:x}, {conf1:x, conf2:x, conf3:x}, ... , {}], noise2: []}
     for dir in dirs:
+        speaker_count = speaker_count + 1
+        print("Speaker : {}/280\n".format(speaker_count))
         print(dir)
-        exit(0)
         tree = dir.split('/')
+        print(tree)
         if tree[-1] == 'conversation':
             typen = 'conversation'
         elif tree[-2] == 'joint':
             typen = 'joint'
-        elif tree[4] == 'babble':
+        elif tree[5] == 'babble':
             typen = 'babble'
-        elif tree[4] == 'factory2':
+        elif tree[5] == 'factory2':
             typen = 'factory2'
-        elif tree[4] == 'leopard':
+        elif tree[5] == 'leopard':
             typen = 'leopard'
-        elif tree[4] == 'volvo':
+        elif tree[5] == 'volvo':
             typen = 'volvo'
         else:
             typen = 'gun'

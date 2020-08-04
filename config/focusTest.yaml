@@ -16,7 +16,7 @@ model:
 ---
 data:
   train_dir: '/data/small/train'
-  test_dir: '/data/test_good_2/'
+  test_dir: '/data/good_focus/'
   audio_len: 3.0
 ---
 form:
