@@ -77,7 +77,7 @@ if __name__ == '__main__':
 
     for dir in dirs:
         speaker_count = speaker_count + 1
-        print("Speaker : {}/40\n".format(speaker_count))
+        print("Speaker : {}/280\n".format(speaker_count))
         hp.data.test_dir = dir
         testloader = create_dataloader(hp, args, train=False)
         result_purified1 = []
@@ -95,7 +95,7 @@ if __name__ == '__main__':
             ref_mel, eliminated_wav, mixed_wav, expected_hidden_wav, eliminated_mag, expected_hidden_mag, mixed_mag, mixed_phase, dvec_path, eliminated_wav_path, mixed_wav_path = \
                 batch[0]
             # print("eliminated: {}".format(eliminated_wav_path))
-            # print("Mixed: {}".format(mixed_wav_path))
+            print("Mixed: {}".format(mixed_wav_path))
             model = VoiceFilter(hp).cuda()
             chkpt_model = torch.load(args.checkpoint_path, map_location='cuda:0')['model']
             model.load_state_dict(chkpt_model)
@@ -136,15 +136,15 @@ if __name__ == '__main__':
 
             os.makedirs(args.out_dir, exist_ok=True)
             purified1 = os.path.join(args.out_dir, 'result1.wav')
-            purified2 = os.path.join(args.out_dir, 'result2.wav')
-            purified3 = os.path.join(args.out_dir, 'result3.wav')
+            # purified2 = os.path.join(args.out_dir, 'result2.wav')
+            # purified3 = os.path.join(args.out_dir, 'result3.wav')
             eliminated_path = os.path.join(args.out_dir, 'eliminated.wav')
             expected_hidden_path = os.path.join(args.out_dir, 'expected_hidden.wav')
             mixed_path = os.path.join(args.out_dir, 'mixed.wav')
             # original mixed wav and eliminated wav are not PCM, cannot be read by google cloud
             wavio.write(purified1, recorded_wav1, 16000, sampwidth=2)  # frequency +
-            wavio.write(purified2, shadow_wav, 16000, sampwidth=2)  # est noise
-            wavio.write(purified3, hidden_wav, 16000, sampwidth=2)  # mix + est noise
+            # wavio.write(purified2, shadow_wav, 16000, sampwidth=2)  # est noise
+            # wavio.write(purified3, hidden_wav, 16000, sampwidth=2)  # mix + est noise
             wavio.write(eliminated_path, eliminated_wav, 16000, sampwidth=2)
             wavio.write(expected_hidden_path, expected_hidden_wav, 16000, sampwidth=2)
             wavio.write(mixed_path, mixed_wav, 16000, sampwidth=2)
@@ -153,12 +153,12 @@ if __name__ == '__main__':
             mixed_dvec = wav_to_embedding(mixed_wav, embedder)
 
             purified1_dvec = wav_to_embedding(recorded_wav1, embedder)
-            purified2_dvec = wav_to_embedding(shadow_wav, embedder)
-            purified3_dvec = wav_to_embedding(hidden_wav, embedder)
+            # purified2_dvec = wav_to_embedding(shadow_wav, embedder)
+            # purified3_dvec = wav_to_embedding(hidden_wav, embedder)
 
             purified1_conf = cosine_similarity(dvec, purified1_dvec)[0][0]
-            purified2_conf = cosine_similarity(dvec, purified2_dvec)[0][0]
-            purified3_conf = cosine_similarity(dvec, purified3_dvec)[0][0]
+            # purified2_conf = cosine_similarity(dvec, purified2_dvec)[0][0]
+            # purified3_conf = cosine_similarity(dvec, purified3_dvec)[0][0]
             mixed_conf = cosine_similarity(dvec, mixed_dvec)[0][0]
 
             try:
