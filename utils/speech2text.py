@@ -39,7 +39,7 @@ def speech_2_text(wav_groundtruth=path.join(path.dirname(path.realpath(__file__)
     (sdr, sir, sar, _) = mir_eval.separation.bss_eval_sources(audio_pesq, audio_estimated_pesq, compute_permutation=True)
 
     if engine_name == 'google':
-        GOOGLE_CLOUD_SPEECH_CREDENTIALS_PATH = path.join(path.dirname(path.realpath(__file__)), "mykey2.json")
+        GOOGLE_CLOUD_SPEECH_CREDENTIALS_PATH = path.join(path.dirname(path.realpath(__file__)), "mykey3.json")
         with open(GOOGLE_CLOUD_SPEECH_CREDENTIALS_PATH, 'r') as file:
             GOOGLE_CLOUD_SPEECH_CREDENTIALS = file.read()
         try:
