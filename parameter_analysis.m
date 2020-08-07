@@ -100,12 +100,12 @@ data_root = './pic_making/';
 
 % differnt noise
 data_type=["merged-joint","merged-conv","merged-babble","merged-factory","merged-volvo"];
-metric = ["WER", "pesq", "SDR", "Confidence"];
+metric = ["WER", "SDR"];
 table_num=data_type.size(2);
 sheet_num=2;%item_per_xaxis_num
 xaxis_num=5;
-metric_num=3;
-item_selection='focus_train_';
+metric_num=2;
+item_selection='hide_train_';
 
 error_matrix_total=cell(table_num,sheet_num);
 for ii=1:table_num
@@ -114,7 +114,7 @@ for ii=1:table_num
     [~,sheet_name]=xlsfinfo(error_path);
     for k=1:sheet_num
         T=xlsread(error_path,sheet_name{k});
-        error_matrix_total{ii,k}=T(:,[5,8,9]);
+        error_matrix_total{ii,k}=T(:,[5,9]);
     end
 end
 
@@ -135,10 +135,10 @@ for jj=1:metric_num
     multiple_boxplot(raw_data,xlab,{'Our system', 'Mixed'},col')
     ylabel(metric(jj));
     if jj==1
-        ylim([-1,5]);
+        ylim([-1,4]);
     end
     set(gcf,'WindowStyle','normal','Position', [200,200,640,360]);
-    saveas(gcf,['boxplot_benchmark_',item_selection,int2str(jj),'.pdf'])
+    saveas(gcf,['boxplot_benchmark_',item_selection,int2str(jj),'.png'])
 end
 
 %% correlation_matrix
