@@ -1,4 +1,4 @@
-function errorbit = arbitraryTo33500_WaveformSend(arb,fgen,name)
+function errorbit = port_arbitraryTo33500_WaveformSend(arb,fgen,name,port)
 % This function connects to a 33500A/B waveform generator and sends it an
 % arbitrary waveform from Matlab via GPIB. The input arguments are as
 % follows:
@@ -35,10 +35,10 @@ arb = (1*arb)/mx;
 % waitbar(.1,h,mes);
 
 %send waveform to 33500
-fprintf(fgen, ['SOURce1:DATA:VOLatile:CLEar']); %Clear volatile memory
+fprintf(fgen, ['SOURce' int2str(port) ':DATA:VOLatile:CLEar']); %Clear volatile memory
 fprintf(fgen, 'FORM:BORD SWAP');  %configure the box to correctly accept the binary arb points
 arbBytes = num2str(length(arb) * 4); %# of bytes
-header= ['SOURce1:DATA:ARBitrary ' name ', #' num2str(length(arbBytes)) arbBytes]; %create header
+header= ['SOURce' int2str(port) ':DATA:ARBitrary ' name ', #' num2str(length(arbBytes)) arbBytes]; %create header
 binblockBytes = typecast(arb, 'uint8');  % convert datapoints to binary before sending
 fwrite(fgen, [header binblockBytes], 'uint8'); % combine header and datapoints then send to instrument
 fprintf(fgen, '*WAI');   % Make sure no other commands are exectued until arb is done downloadin
@@ -46,9 +46,9 @@ fprintf(fgen, '*WAI');   % Make sure no other commands are exectued until arb is
 
 
 
-command = ['SOURce1:FUNCtion:ARBitrary ' name];
+command = ['SOURce' int2str(port) ':FUNCtion:ARBitrary ' name];
 fprintf(fgen,command); % set current arb waveform to defined arb testrise
-command = ['MMEM:STOR:DATA1 "INT:\' name '.arb"']; %store arb in intermal NV memory
+command = ['MMEM:STOR:DATA' int2str(port) ' "INT:\' name '.arb"']; %store arb in intermal NV memory
 fprintf(fgen,command);
 % 
 % command = ['SOURCE1:FUNCtion:ARB:SRATe ' num2str(sRate)]; %create sample rate command

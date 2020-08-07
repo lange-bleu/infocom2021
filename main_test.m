@@ -13,7 +13,10 @@ clear
 close all
 tic
 
-mixed_audio_path='utils/speakerA.wav';
+% mixed_audio_path='eva-focus/mixed.wav';
+mixed_audio_path='utils/google.mp3';
+port=2;
+ampExcite = 0.5; % Vpp
 % 
 
 %% play mixed_audio
@@ -54,7 +57,6 @@ sRate = aFs*Fs;
 % parameters of 33500 waveform generator
 Address_33500 = '10';
 sRate_33500 = sRate;
-ampExcite = 9; % Vpp
 % f_end = 25.3e3; % sweep frequency Hz
 % delta_f = 1e2;
 % f_start = 24.7e3;
@@ -85,11 +87,14 @@ fgen = LinkTo33500_GPIB(Address_33500,lengthArb);
 
 %% Sweeping Measurement
 name = 'maskAudio';
+
 if flagNewTest~=0
-    waveSendErrorBit = arbitraryTo33500_WaveformSend(yi,fgen,name);
+%     waveSendErrorBit = arbitraryTo33500_WaveformSend(yi,fgen,name);
+    waveSendErrorBit = port_arbitraryTo33500_WaveformSend(yi,fgen,name,port);
     if ~waveSendErrorBit % if exciting works
         pause(0.01);
-        exciteErrorBit = arbitraryTo33500_Burst(fgen,ampExcite,sRate_33500,name,burstPeriod);
+%         exciteErrorBit = arbitraryTo33500_Burst(fgen,ampExcite,sRate_33500,name,burstPeriod);
+        exciteErrorBit = port_arbitraryTo33500_Burst(fgen,ampExcite,sRate_33500,name,burstPeriod,port);
         if ~exciteErrorBit % if exciting works
             pause(pausePeriod);
         else % if exciting error

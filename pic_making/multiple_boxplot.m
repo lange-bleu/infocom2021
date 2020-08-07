@@ -45,7 +45,7 @@ for ii=1:L
     end
 end
 % Plot it
-boxplot(x,group, 'positions', positions);
+boxplot(x,group, 'positions', positions,'symbol','');
 
 % Set the Xlabels
 aux=reshape(positions,M,[]);
