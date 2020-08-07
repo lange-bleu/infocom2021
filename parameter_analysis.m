@@ -98,65 +98,74 @@ data_root = './pic_making/';
 % saveas(gcf,[data_root,'confidence.pdf'])
 % end
 
-%% differnt noise
-% data_type=["merged-joint","merged-conv","merged-babble","merged-factory","merged-volvo"];
-% metric = ["WER", "pesq", "SDR", "Confidence"];
-% table_num=data_type.size(2);
-% sheet_num=2;%item_per_xaxis_num
-% xaxis_num=5;
-% metric_num=3;
-% item_selection='train_';
-%
-% error_matrix_total=cell(table_num,sheet_num);
-% for ii=1:table_num
-%     error_dir = [data_root,'hide_' item_selection 'excels/',data_type(ii), '.xlsx'];
-%     error_path = string(join(error_dir,''));
-%     [~,sheet_name]=xlsfinfo(error_path);
-%     for k=1:sheet_num
-%         T=xlsread(error_path,sheet_name{k});
-%         error_matrix_total{ii,k}=T(:,[5,8,9]);
-%     end
-% end
-%
-% raw_data=cell(xaxis_num,sheet_num);
-% for jj=1:metric_num
-%     for ii=1:table_num
-%         for kk=1:sheet_num
-%             data_per_noise=error_matrix_total{ii,kk};
-%             raw_data{ii,kk}=data_per_noise(:,jj);
-%         end
-%     end
-%
-%     xlab={'Joint','Conv.','Babble','Factory','Vehicle'};
-%     col=[102,255,255, 200;
-%         51,153,255, 200];
-%     col=col/255;
-%
-%     multiple_boxplot(raw_data,xlab,{'Our system', 'Mixed'},col')
-%     ylabel(metric(jj));
-%     set(gcf,'WindowStyle','normal','Position', [200,200,640,360]);
-%     saveas(gcf,['boxplot_benchmark_',item_selection,int2str(jj),'.pdf'])
-% end
+% differnt noise
+data_type=["merged-joint","merged-conv","merged-babble","merged-factory","merged-volvo"];
+metric = ["WER", "pesq", "SDR", "Confidence"];
+table_num=data_type.size(2);
+sheet_num=2;%item_per_xaxis_num
+xaxis_num=5;
+metric_num=3;
+item_selection='focus_train_';
+
+error_matrix_total=cell(table_num,sheet_num);
+for ii=1:table_num
+    error_dir = [data_root item_selection 'excels/',data_type(ii), '.xlsx'];
+    error_path = string(join(error_dir,''));
+    [~,sheet_name]=xlsfinfo(error_path);
+    for k=1:sheet_num
+        T=xlsread(error_path,sheet_name{k});
+        error_matrix_total{ii,k}=T(:,[5,8,9]);
+    end
+end
+
+raw_data=cell(xaxis_num,sheet_num);
+for jj=1:metric_num
+    for ii=1:table_num
+        for kk=1:sheet_num
+            data_per_noise=error_matrix_total{ii,kk};
+            raw_data{ii,kk}=data_per_noise(:,jj);
+        end
+    end
+
+    xlab={'Joint','Conv.','Babble','Factory','Vehicle'};
+    col=[102,255,255, 200;
+        51,153,255, 200];
+    col=col/255;
+
+    multiple_boxplot(raw_data,xlab,{'Our system', 'Mixed'},col')
+    ylabel(metric(jj));
+    if jj==1
+        ylim([-1,5]);
+    end
+    set(gcf,'WindowStyle','normal','Position', [200,200,640,360]);
+    saveas(gcf,['boxplot_benchmark_',item_selection,int2str(jj),'.pdf'])
+end
 
 %% correlation_matrix
-error_dir = [data_root,'matrix.mat'];
-load(error_dir);
-signal=speakers;
-colormap(jet);
-surf(1:size(signal,2),1:size(signal,1),signal(:,:));view([0,90]);
-xlim([0,size(signal,2)]);ylim([0,size(signal,1)]);
-% xlabel('Speakers'); % x label
-% ylabel('Speakers'); % y label
-xticklabels({'A','B','C','D'});
-yticklabels({'A','B','C','D'});
-colorbar; %Use colorbar only if necessary
-
+% error_dir = [data_root,'matrix.mat'];
+% load(error_dir);
+% signal=speakers;
+% colormap(jet);
+% surf(1:size(signal,2),1:size(signal,1),signal(:,:));view([0,90]);
+% xlim([1,size(signal,2)]);ylim([1,size(signal,1)]);
+% % xlabel('Speakers'); % x label
+% % ylabel('Speakers'); % y label
+% xticks([5 15 25 35])
+% xticklabels({'A','B','C','D'});
+% yticks([5 15 25 35])
+% yticklabels({'A','B','C','D'});
+% colorbar; %Use colorbar only if necessary
+% 
 % line_x=[-5,10,20,30,45];
-% line_y=[10,10,10,10,10];
-% for x=1:3
+% line_y=[11,11,11,11,11];
+% for i=1:3
 %     hold on;
-%     plot(line_x',line_y',"-.r*","lineWidth",2);
+%     plot3(line_x,line_y+10*(i-1),ones(5,1),"k",'LineWidth',5);
 % end
-
-set(gcf,'WindowStyle','normal','Position', [200,200,480,360]);
-saveas(gcf,['correlation_matrix.pdf'])
+% for i=1:3
+%     hold on;
+%     plot3(line_y+10*(i-1),line_x,ones(5,1),"k",'LineWidth',5);
+% end
+% 
+% set(gcf,'WindowStyle','normal','Position', [200,200,480,360]);
+% saveas(gcf,['./fig/correlation_matrix.pdf'])
