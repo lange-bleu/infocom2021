@@ -4,6 +4,7 @@ config/*
 !config/focusTest.yaml
 !config/hideTest.yaml
 
+audio_datasets/
 temp/
 chkpt/
 logs/
