@@ -16,7 +16,7 @@ tic
 % mixed_audio_path='eva-focus/mixed.wav';
 mixed_audio_path='utils/google.mp3';
 port=1;
-ampExcite = 0.5; % Vpp
+ampExcite = 0.1; % Vpp
 % 
 
 %% play mixed_audio
@@ -86,7 +86,7 @@ instrreset;
 fgen = LinkTo33500_GPIB(Address_33500,lengthArb);
 
 %% Sweeping Measurement
-name = 'maskAudio';
+name = 'maskAudio1';
 
 if flagNewTest~=0
 %     waveSendErrorBit = arbitraryTo33500_WaveformSend(yi,fgen,name);

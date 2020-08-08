@@ -16,15 +16,15 @@ tic
 data_root = './audio_datasets/test/';
 data_noise=["joint","conversation","babble","volvo"];
 port=1;
-ampExcite = 2; % Vpp
+ampExcite = 3; % Vpp
 % for AM modulation
-m = 0.5;
+m = 0.7;
 
 f_end = 32e3; % sweep frequency Hz
 delta_f = 1e2;
 f_start = 26e3;
 % fvect = [f_start:delta_f:f_end];
-fvect = [25.3].*1e3;
+fvect = [27.2].*1e3;
 aFs = 4;
 
 
@@ -40,21 +40,22 @@ numFreqs = length(fvect);
 burstPeriod = 8; % s
 pausePeriod = 16; % s
 
-for audio_file_index=1:18
+for audio_file_index=2:18
     for noise_index=1:4
-        mixed_audio_dir=[data_root 'SV_' int2str(audio_file_index) '/' data_noise(noise_index) '/*hide1-48k.wav'];
-        shadow_audio_dir=[data_root 'SV_' int2str(audio_file_index) '/' data_noise(noise_index) '/*hide1-48k.wav'];
+        mixed_audio_dir=[data_root 'SV_' int2str(audio_file_index) '/' data_noise(noise_index) '/*mixed.wav'];
+        shadow_audio_dir=[data_root 'SV_' int2str(audio_file_index) '/' data_noise(noise_index) '/*hide2-48k.wav'];
         mixed_audio_dir = string(join(mixed_audio_dir,''));
         shadow_audio_dir = string(join(shadow_audio_dir,''));
         mixed_audio_path = dir(mixed_audio_dir);
         shadow_audio_path = dir(shadow_audio_dir);
         
-        for file_index=1:length(mixed_audio_path)
+        for file_index=20
             mixed_audio_file=[mixed_audio_path(file_index).folder '\' mixed_audio_path(file_index).name];
             shadow_audio_file=[shadow_audio_path(file_index).folder '\' shadow_audio_path(file_index).name];
             
             %% play mixed_audio
             [mixed_audio, Fs_mixed] = audioread(mixed_audio_file);
+%             shadow_audio_file='utils/google.mp3';
             [shadow_audio, Fs_shadow] = audioread(shadow_audio_file);
             
             %             soundsc(mixed_audio, Fs_mixed);
@@ -96,7 +97,8 @@ for audio_file_index=1:18
             t = (1:lengthArb)/sRate_33500;
             fgen = LinkTo33500_GPIB(Address_33500,lengthArb);
             
-            name = shadow_audio_path(file_index).name(1:end-4);
+%             name = shadow_audio_path(file_index).name(1:end-4);
+            name = 'maskAudio';
             %% Sweeping Measurement
             if flagNewTest~=0
                 % create waitbar for sweeping
