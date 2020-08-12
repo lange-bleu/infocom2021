@@ -16,7 +16,7 @@ tic
 % mixed_audio_path='eva-focus/mixed.wav';
 mixed_audio_path='utils/google.mp3';
 port=1;
-ampExcite = 0.1; % Vpp
+ampExcite = 1; % Vpp
 % 
 
 %% play mixed_audio

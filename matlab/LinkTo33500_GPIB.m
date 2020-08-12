@@ -2,7 +2,7 @@ function fgen = LinkTo33500_GPIB(IP,lengthArb)
 
 % voffset = 0;
 vAddress = ['GPIB0::' IP '::INSTR']; %build visa address string to connect
-fgen = visa('keysight',vAddress); %build IO object
+fgen = visa('AGILENT',vAddress); %build IO object
 fgen.Timeout = 60; %set IO time out
 
 if nargin == 2
@@ -25,7 +25,7 @@ end
 % fprintf ('\n\n');
 
 %Reset instrument
-fprintf (fgen, '*RST');
+% fprintf (fgen, '*RST');
 
 
 

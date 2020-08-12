@@ -5,6 +5,7 @@ config/*
 !config/hideTest.yaml
 
 audio_datasets/
+user_case_datasets/
 temp/
 chkpt/
 logs/
