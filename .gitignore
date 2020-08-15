@@ -4,6 +4,8 @@ config/*
 !config/focusTest.yaml
 !config/hideTest.yaml
 
+group_audio2/
+compare_exp/
 audio_datasets/
 user_case_datasets/
 temp/

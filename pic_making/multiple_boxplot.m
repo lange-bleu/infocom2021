@@ -76,6 +76,6 @@ for jj=1:length(h)
 end
 
 if nargin>=3
-    legend(fliplr(Mlab));
+    legend(fliplr(Mlab),'Orientation','horizontal');
 end
 end
