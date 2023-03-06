@@ -1,6 +1,7 @@
 .idea/
 # configuration yaml files
 config/*
+!config/default.yaml
 !config/focusTest.yaml
 !config/hideTest.yaml
 
