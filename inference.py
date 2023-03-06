@@ -1,4 +1,5 @@
 import os
+# os.environ["CUDA_VISIBLE_DEVICES"] = "1,2,3,4,5,6,7"
 import glob
 import torch
 import librosa
@@ -38,9 +39,9 @@ def main(args, hp):
         shadow_mag = model(mixed_mag, dvec)
 
         shadow_mag = shadow_mag[0].cpu().detach().numpy()
-        recorded_mag = tensor_normalize(mixed_mag + shadow_mag)
+        recorded_mag = tensor_normalize(mixed_mag.cpu() + shadow_mag)
         recorded_mag = recorded_mag[0].cpu().detach().numpy()
-        recorded_wav = audio.spec2wav(recorded_mag, mixed_mag)
+        recorded_wav = audio.spec2wav(recorded_mag, mixed_mag.view(301,601).cpu().detach().numpy())
 
         os.makedirs(args.out_dir, exist_ok=True)
         out_path = os.path.join(args.out_dir, 'result.wav')
