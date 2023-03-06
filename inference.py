@@ -41,7 +41,7 @@ def main(args, hp):
         shadow_mag = shadow_mag[0].cpu().detach().numpy()
         recorded_mag = tensor_normalize(mixed_mag.cpu() + shadow_mag)
         recorded_mag = recorded_mag[0].cpu().detach().numpy()
-        recorded_wav = audio.spec2wav(recorded_mag, mixed_mag.view(301,601).cpu().detach().numpy())
+        recorded_wav = audio.spec2wav(recorded_mag, mixed_phase)
 
         os.makedirs(args.out_dir, exist_ok=True)
         out_path = os.path.join(args.out_dir, 'result.wav')
