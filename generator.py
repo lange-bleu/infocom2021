@@ -117,7 +117,7 @@ if __name__ == '__main__':
         raise Exception("Please provide directory of data")
 
     if args.libri_dir is not None:
-        train_folders = [x for x in glob.glob(os.path.join(args.libri_dir, 'train-clean-100', '*'))
+        train_folders = [x for x in glob.glob(os.path.join(args.libri_dir, 'train-clean-360', '*'))
                             if os.path.isdir(x)]
         # [x for x in glob.glob(os.path.join(args.libri_dir, 'train-clean-100', '*'))
         #                     if os.path.isdir(x)] + \
@@ -128,7 +128,7 @@ if __name__ == '__main__':
                         # + \
                         #[x for x in glob.glob(os.path.join(args.libri_dir, 'train-other-500', '*'))
                         #    if os.path.isdir(x)]
-        test_folders = [x for x in glob.glob(os.path.join(args.libri_dir, 'dev-clean', '*'))]
+        test_folders = [x for x in glob.glob(os.path.join(args.libri_dir, 'train-clean-100', '*'))]
 
     elif args.voxceleb_dir is not None:
         all_folders = [x for x in glob.glob(os.path.join(args.voxceleb_dir, '*'))
@@ -158,7 +158,7 @@ if __name__ == '__main__':
         s2 = random.choice(spk2)
         mix(hp, args, audio, num, s1_dvec, s1_target, s2, train=False)
 
-    arr = list(range(10**5))
+    arr = list(range(10**4))
     with Pool(cpu_num) as p:
         r = list(tqdm.tqdm(p.imap(train_wrapper, arr), total=len(arr)))
 
